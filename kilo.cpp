@@ -40,11 +40,12 @@ int main()
 {
     enableRawMode();
 
-    char c; // Character to store input
-
-    // Reading one byte at a time from standard input
-    while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q')
+    while (1)
     {
+        char c; // Character to store input
+
+        // Reading one byte at a time from standard input
+        read(STDIN_FILENO, &c, 1);
         // iscntrl() comes from <ctype.h>, and printf() comes from <stdio.h>
         if (iscntrl(c))
         {
@@ -54,6 +55,8 @@ int main()
         {
             std::cout << int(c) << " ('" << c << "')\r\n"; // Print printable characters
         }
+        if(c == 'q')
+            break;
     }
     return 0;
 }
