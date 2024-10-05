@@ -26,8 +26,8 @@ void enableRawMode()
 
     raw.c_lflag &= ~(ECHO | ICANON | ISIG | IEXTEN);          // Disable echo, canonical mode, Ctrl-C/Z signals
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); // Disable input flags
-    raw.c_oflag &= ~(OPOST);                                  // Disable output processing
-    raw.c_cflag |= (CS8);                                     // Set character size to 8 bits
+    // raw.c_oflag &= ~(OPOST);                                  // Disable output processing
+    // raw.c_cflag |= (CS8);                                     // Set character size to 8 bits
 
     // raw.c_cc[VMIN] = 0;  // Set minimum number of bytes to read
     // raw.c_cc[VTIME] = 1; // Set timeout for reading
@@ -49,11 +49,11 @@ int main()
         // iscntrl() comes from <ctype.h>, and printf() comes from <stdio.h>
         if (iscntrl(c))
         {
-            std::cout << int(c) << "\n"; // Print control characters as integers
+            std::cout << int(c) << "\r\n"; // Print control characters as integers
         }
         else
         {
-            std::cout << int(c) << " ('" << c << "')\n"; // Print printable characters
+            std::cout << int(c) << " ('" << c << "')\r\n"; // Print printable characters
         }
         if(c == 'q')
             break;
