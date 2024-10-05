@@ -49,11 +49,11 @@ int main()
         // iscntrl() comes from <ctype.h>, and printf() comes from <stdio.h>
         if (iscntrl(c))
         {
-            std::cout << int(c) << "\r\n"; // Print control characters as integers
+            std::cout << int(c) << "\n"; // Print control characters as integers
         }
         else
         {
-            std::cout << int(c) << " ('" << c << "')\r\n"; // Print printable characters
+            std::cout << int(c) << " ('" << c << "')\n"; // Print printable characters
         }
         if(c == 'q')
             break;
