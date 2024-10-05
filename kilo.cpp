@@ -29,8 +29,8 @@ void enableRawMode()
     raw.c_oflag &= ~(OPOST);                                  // Disable output processing
     raw.c_cflag |= (CS8);                                     // Set character size to 8 bits
 
-    raw.c_cc[VMIN] = 0;  // Set minimum number of bytes to read
-    raw.c_cc[VTIME] = 1; // Set timeout for reading
+    // raw.c_cc[VMIN] = 0;  // Set minimum number of bytes to read
+    // raw.c_cc[VTIME] = 1; // Set timeout for reading
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); // Apply new settings
 }
