@@ -4,7 +4,6 @@
 #include <stdlib.h>  // For atexit()
 #include <termios.h> // Terminal I/O attributes
 
-
 /** Data */
 struct termios orig_termios;
 
@@ -40,6 +39,8 @@ int main()
 {
     enableRawMode();
 
+    printf("Welcome to the text Editor");
+    printf("Ths is the raw mode. Raw mode is a terminal setting that allows the program to read input directly from the user without buffering or processing (like echoing characters or interpreting special keys). This lets the editor respond immediately to each keypress for an interactive editing experience. ");
     while (1)
     {
         char c; // Character to store input
@@ -55,8 +56,9 @@ int main()
         {
             std::cout << int(c) << " ('" << c << "')\r\n"; // Print printable characters
         }
-        if(c == 'q')
+        if (c == 'q')
             break;
     }
     return 0;
 }
+
