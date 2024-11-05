@@ -39,10 +39,13 @@ int main()
 {
     enableRawMode();
 
-    printf("Welcome to the text Editor \n");
-    printf("Ths is the raw mode. Raw mode is a terminal setting that allows the program to read input directly from the user without buffering or processing (like echoing characters or interpreting special keys). This lets the editor respond immediately to each keypress for an interactive editing experience. \n");
+    printf("Welcome to the text Editor\n");
+    printf("This is the raw mode.\n");
+    printf("Raw mode is a terminal setting that allows the program to read input directly from the user\n");
+    printf("without buffering or processing (like echoing characters or interpreting special keys).\n");
+    printf("This lets the editor respond immediately to each keypress for an interactive editing experience.\n");
     printf("Enter 'q' to exit.\n");
-    printf("\n");
+
     while (1)
     {
         char c; // Character to store input
@@ -63,4 +66,3 @@ int main()
     }
     return 0;
 }
-
