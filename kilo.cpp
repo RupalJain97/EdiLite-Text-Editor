@@ -39,7 +39,7 @@ void enableRawMode()
 
 
 void die(const char* s) {
-    std::cerr << s << ": " << strerror(errno) << std::endl;
+    std::cerr << s << ": " << strerr(errno) << std::endl;
     exit(EXIT_FAILURE);
 }
 
