@@ -94,6 +94,18 @@ void editorRefreshScreen()
     if you have an 80×24 size terminal and you want the cursor in the center of the screen, you could use the command <esc>[12;40H. (Multiple arguments are separated by a ; character.) The default arguments for H both happen to be 1.
     */
     write(STDOUT_FILENO, "\x1b[H", 3);
+
+    editorDrawRows();
+    write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
+/*** Output ***/
+void editorDrawRows()
+{
+    for (int y = 0; y < 24; y++)
+    {
+        write(STDOUT_FILENO, "~\r\n", 3); // Draw a tilde at the start of each line
+    }
 }
 
 /** Init */
@@ -102,7 +114,7 @@ int main()
     std::cout << "Welcome to the text Editor\n";
     // std::cout << "This is the raw mode.\n";
     // std::cout << "Raw mode is a terminal setting that allows the program to read input directly from the user without buffering or processing (like echoing characters or interpreting special keys). This lets the editor respond immediately to each keypress for an interactive editing experience.\n";
-    std::cout << "Enter 'q' to exit.\n";
+    // std::cout << "Enter 'q' to exit.\n";
 
     enableRawMode();
 
