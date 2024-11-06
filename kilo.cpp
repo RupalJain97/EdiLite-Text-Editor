@@ -3,6 +3,7 @@
 #include <unistd.h>  // For read() and STDIN_FILENO
 #include <stdlib.h>  // For atexit()
 #include <termios.h> // Terminal I/O attributes
+#include <errno.h>
 
 /** Data */
 struct termios orig_termios;
@@ -39,7 +40,7 @@ void enableRawMode()
 
 
 void die(const char* s) {
-    std::cerr << s << ": " << stderr(errno) << std::endl;
+    std::cerr << s << ": " << strerror(errno) << std::endl;
     exit(EXIT_FAILURE);
 }
 
