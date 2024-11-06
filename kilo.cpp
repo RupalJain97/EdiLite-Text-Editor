@@ -24,6 +24,18 @@ struct editorConfig E;
 // TODO
 
 /** Terminal */
+
+void die(const char *s)
+{
+    /* Clear the screen on exit */
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
+    perror(s);
+    exit(1);
+}
+
+
 void disableRawMode()
 {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
@@ -51,16 +63,6 @@ void enableRawMode()
     // Apply new settings
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
         die("tcsetattr");
-}
-
-void die(const char *s)
-{
-    /* Clear the screen on exit */
-    write(STDOUT_FILENO, "\x1b[2J", 4);
-    write(STDOUT_FILENO, "\x1b[H", 3);
-
-    perror(s);
-    exit(1);
 }
 
 char editorReadKey()
