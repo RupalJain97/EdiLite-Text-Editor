@@ -4,6 +4,7 @@
 #include <stdlib.h>  // For atexit()
 #include <termios.h> // Terminal I/O attributes
 #include <errno.h>
+#include <cstring>  // For strerror
 
 /** Data */
 struct termios orig_termios;
