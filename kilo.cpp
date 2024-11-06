@@ -41,8 +41,12 @@ void enableRawMode()
 
 void die(const char *s)
 {
-    std::cerr << s << ": " << strerror(errno) << std::endl;
-    exit(EXIT_FAILURE);
+    /* Clear the screen on exit */
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
+    perror(s);
+    exit(1);
 }
 
 char editorReadKey()
@@ -65,7 +69,10 @@ void editorProcessKeypress()
     switch (c)
     {
     case CTRL_KEY('q'):
+        /* Clear the screen when user presses Ctrl-Q to quit */
         std::cout << "Exiting editor...\n";
+        write(STDOUT_FILENO, "\x1b[2J", 4);
+        write(STDOUT_FILENO, "\x1b[H", 3);
         exit(0);
         break;
     }
@@ -80,6 +87,13 @@ void editorRefreshScreen()
     The 4 in our write() call means we are writing 4 bytes out to the terminal. The first byte is \x1b, which is the escape character, or 27 in decimal. (Try and remember \x1b, we will be using it a lot.) The other three bytes are [2J.
     */
     write(STDOUT_FILENO, "\x1b[2J", 4);
+
+    /*
+    reposition the cursor which is at the top-left corner so that we’re ready to draw the editor interface from top to bottom.
+
+    if you have an 80×24 size terminal and you want the cursor in the center of the screen, you could use the command <esc>[12;40H. (Multiple arguments are separated by a ; character.) The default arguments for H both happen to be 1.
+    */
+    write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
 /** Init */
