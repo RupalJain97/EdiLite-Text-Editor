@@ -79,6 +79,14 @@ void editorProcessKeypress()
 }
 
 /*** Output ***/
+void editorDrawRows()
+{
+    for (int y = 0; y < 24; y++)
+    {
+        write(STDOUT_FILENO, "~\r\n", 3); // Draw a tilde at the start of each line
+    }
+}
+
 void editorRefreshScreen()
 {
     /*
@@ -99,14 +107,6 @@ void editorRefreshScreen()
     write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
-/*** Output ***/
-void editorDrawRows()
-{
-    for (int y = 0; y < 24; y++)
-    {
-        write(STDOUT_FILENO, "~\r\n", 3); // Draw a tilde at the start of each line
-    }
-}
 
 /** Init */
 int main()
