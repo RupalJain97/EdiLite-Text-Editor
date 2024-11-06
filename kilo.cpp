@@ -4,7 +4,7 @@
 #include <stdlib.h>  // For atexit()
 #include <termios.h> // Terminal I/O attributes
 #include <errno.h>
-#include <cstring>  // For strerror
+#include <cstring> // For strerror
 
 /** Data */
 struct termios orig_termios;
@@ -39,10 +39,47 @@ void enableRawMode()
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); // Apply new settings
 }
 
-
-void die(const char* s) {
+void die(const char *s)
+{
     std::cerr << s << ": " << strerror(errno) << std::endl;
     exit(EXIT_FAILURE);
+}
+
+char editorReadKey()
+{
+    int nread;
+    char c;
+    while ((nread = read(STDIN_FILENO, &c, 1)) != 1)
+    {
+        if (nread == -1 && errno != EAGAIN)
+            die("read");
+    }
+    return c;
+}
+
+/*** Input ***/
+void editorProcessKeypress()
+{
+    char c = editorReadKey();
+
+    switch (c)
+    {
+    case CTRL_KEY('q'):
+        std::cout << "Exiting editor...\n";
+        exit(0);
+        break;
+    }
+}
+
+/*** Output ***/
+void editorRefreshScreen()
+{
+    /*
+    write() and STDOUT_FILENO come from <unistd.h>.
+
+    The 4 in our write() call means we are writing 4 bytes out to the terminal. The first byte is \x1b, which is the escape character, or 27 in decimal. (Try and remember \x1b, we will be using it a lot.) The other three bytes are [2J.
+    */
+    write(STDOUT_FILENO, "\x1b[2J", 4);
 }
 
 /** Init */
@@ -57,21 +94,8 @@ int main()
 
     while (1)
     {
-        char c = '\0'; // Character to store input
-
-        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
-
-        // iscntrl() comes from <ctype.h>
-        if (iscntrl(c))
-        {
-            std::cout << int(c) << "\r\n"; // Print control characters as integers
-        }
-        else
-        {
-            std::cout << int(c) << " ('" << c << "')\r\n"; // Print printable characters
-        }
-        if (c == CTRL_KEY('q'))
-            break;
+        editorRefreshScreen();
+        editorProcessKeypress();
     }
     return 0;
 }
