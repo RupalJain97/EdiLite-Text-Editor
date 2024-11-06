@@ -7,6 +7,9 @@
 /** Data */
 struct termios orig_termios;
 
+/*** defines ***/
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 /** Error Handling */
 // TODO
 
@@ -34,23 +37,29 @@ void enableRawMode()
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); // Apply new settings
 }
 
+
+void die(const char* s) {
+    std::cerr << s << ": " << strerror(errno) << std::endl;
+    exit(EXIT_FAILURE);
+}
+
 /** Init */
 int main()
 {
     std::cout << "Welcome to the text Editor\n";
-    std::cout << "This is the raw mode.\n";
-    std::cout << "Raw mode is a terminal setting that allows the program to read input directly from the user without buffering or processing (like echoing characters or interpreting special keys). This lets the editor respond immediately to each keypress for an interactive editing experience.\n";
+    // std::cout << "This is the raw mode.\n";
+    // std::cout << "Raw mode is a terminal setting that allows the program to read input directly from the user without buffering or processing (like echoing characters or interpreting special keys). This lets the editor respond immediately to each keypress for an interactive editing experience.\n";
     std::cout << "Enter 'q' to exit.\n";
 
     enableRawMode();
 
     while (1)
     {
-        char c; // Character to store input
+        char c = '\0'; // Character to store input
 
-        // Reading one byte at a time from standard input
-        read(STDIN_FILENO, &c, 1);
-        // iscntrl() comes from <ctype.h>, and printf() comes from <stdio.h>
+        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
+
+        // iscntrl() comes from <ctype.h>
         if (iscntrl(c))
         {
             std::cout << int(c) << "\r\n"; // Print control characters as integers
@@ -59,7 +68,7 @@ int main()
         {
             std::cout << int(c) << " ('" << c << "')\r\n"; // Print printable characters
         }
-        if (c == 'q')
+        if (c == CTRL_KEY('q'))
             break;
     }
     return 0;
