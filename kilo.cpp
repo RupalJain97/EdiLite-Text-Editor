@@ -490,7 +490,7 @@ void editorDrawRows(std::string &ab)
     }
 }
 
-void editorDrawStatusBar(struct abuf *ab)
+void editorDrawStatusBar(std::string &ab)
 {
     ab.append("\x1b[7m"); // Invert colors
     char status[80], rstatus[80];
@@ -519,7 +519,7 @@ void editorDrawStatusBar(struct abuf *ab)
     ab.append("\r\n");
 }
 
-void editorDrawMessageBar(struct abuf *ab)
+void editorDrawMessageBar(std::string &ab)
 {
     ab.append("\x1b[K"); // Clear the line
     int msglen = strlen(E.statusmsg);
