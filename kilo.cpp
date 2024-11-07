@@ -104,32 +104,6 @@ int getCursorPosition(int *rows, int *cols)
         return -1;
     if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
 
-    // Extract rows and columns from the response
-    // try
-    // {
-    //     size_t semicolon;
-    //     *rows = std::stoi(buf.substr(2), &semicolon);
-    //     *cols = std::stoi(buf.substr(semicolon + 3));
-    // }
-    // catch (e)
-    // {
-    //     return -1;
-    // }
-
-    // std::cout << "\r\n";
-    // char c;
-    // while (read(STDIN_FILENO, &c, 1) == 1)
-    // {
-    //     if (iscntrl(c))
-    //     {
-    //         std::cout << static_cast<int>(c) << "\r\n"; // Print control characters as integers
-    //     }
-    //     else
-    //     {
-    //         std::cout << static_cast<int>(c) << " ('" << c << "')\r\n"; // Print printable characters
-    //     }
-    // }
-
     editorReadKey();
     return -1;
 }
@@ -137,7 +111,7 @@ int getCursorPosition(int *rows, int *cols)
 int getWindowSize(int *rows, int *cols)
 {
     struct winsize ws;
-    if (1 || ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
     {
         // Move the cursor to the bottom-right corner as a fallback
         if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12)
