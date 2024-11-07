@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <cstring>     // For strerror
 #include <sys/ioctl.h> // To get terminal dimensions
+#include <stdio.h>
 
 /** Data */
 // struct termios orig_termios;
@@ -101,19 +102,19 @@ int getCursorPosition(int *rows, int *cols)
     // Check response format and parse
     if (buf[0] != '\x1b' || buf[1] != '[')
         return -1;
-    // if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
+    if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
 
     // Extract rows and columns from the response
-    try
-    {
-        size_t semicolon;
-        *rows = std::stoi(buf.substr(2), &semicolon);
-        *cols = std::stoi(buf.substr(semicolon + 3));
-    }
-    catch (e)
-    {
-        return -1;
-    }
+    // try
+    // {
+    //     size_t semicolon;
+    //     *rows = std::stoi(buf.substr(2), &semicolon);
+    //     *cols = std::stoi(buf.substr(semicolon + 3));
+    // }
+    // catch (e)
+    // {
+    //     return -1;
+    // }
 
     // std::cout << "\r\n";
     // char c;
