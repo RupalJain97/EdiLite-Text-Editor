@@ -20,6 +20,7 @@ struct erow
 struct editorConfig
 {
     int cx, cy;
+    int rowoff;
     int screenrows;
     int screencols;
     int numrows;
@@ -283,7 +284,7 @@ void editorMoveCursor(int key)
         }
         break;
     case ARROW_DOWN:
-        if (E.cy != E.screenrows - 1)
+        if (E.cy < E.numrows)
         {
             E.cy++;
         }
@@ -329,11 +330,20 @@ void editorProcessKeypress()
 }
 
 /*** Output ***/
+void editorScroll()
+{
+    if (E.cy < E.rowoff)
+        E.rowoff = E.cy;
+    if (E.cy >= E.rowoff + E.screenrows)
+        E.rowoff = E.cy - E.screenrows + 1;
+}
+
 void editorDrawRows(std::string &ab)
 {
     for (int y = 0; y < E.screenrows; y++)
     {
-        if (y >= E.numrows)
+        int filerow = y + E.rowoff;
+        if (filerow >= E.numrows)
         {
             if (E.numrows == 0 && y == E.screenrows / 3)
             {
@@ -360,10 +370,10 @@ void editorDrawRows(std::string &ab)
         }
         else
         {
-            int len = E.row[y].size;
+            int len = E.row[filerow].size;
             if (len > E.screencols)
                 len = E.screencols;
-            ab.append(E.row[y].chars, len);
+            ab.append(E.row[filerow].chars, len);
         }
         ab.append("\x1b[K"); // clear lines as we draw
         if (y < E.screenrows - 1)
@@ -376,6 +386,7 @@ void editorDrawRows(std::string &ab)
 
 void editorRefreshScreen()
 {
+    editorScroll();
     /*
     write() and STDOUT_FILENO come from <unistd.h>.
 
@@ -420,6 +431,7 @@ void initEditor()
 {
     E.cx = 0;
     E.cy = 0;
+    E.rowoff = 0;
     E.numrows = 0;
     E.row = nullptr;
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
