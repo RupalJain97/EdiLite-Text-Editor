@@ -131,6 +131,25 @@ int getWindowSize(int *rows, int *cols)
 }
 
 /*** Input ***/
+void editorMoveCursor(char key)
+{
+    switch (key)
+    {
+    case 'a':
+        E.cx--;
+        break;
+    case 'd':
+        E.cx++;
+        break;
+    case 'w':
+        E.cy--;
+        break;
+    case 's':
+        E.cy++;
+        break;
+    }
+}
+
 void editorProcessKeypress()
 {
     char c = editorReadKey();
@@ -143,6 +162,13 @@ void editorProcessKeypress()
         write(STDOUT_FILENO, "\x1b[2J", 4);
         write(STDOUT_FILENO, "\x1b[H", 3);
         exit(0);
+        break;
+
+    case 'w':
+    case 's':
+    case 'a':
+    case 'd':
+        editorMoveCursor(c);
         break;
     }
 }
@@ -212,6 +238,10 @@ void editorRefreshScreen()
     // write(STDOUT_FILENO, "\x1b[H", 3);
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
+
+    char buf[32];
+    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+    ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
 
