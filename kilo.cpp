@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <time.h>
+#include <cstdarg>  // For va_list, va_start, va_end
 
 /** Data */
 struct erow
