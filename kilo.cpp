@@ -360,10 +360,10 @@ void editorDrawRows(std::string &ab)
         }
         else
         {
-            int len = E.row.size;
+            int len = E.row[y].size;
             if (len > E.screencols)
                 len = E.screencols;
-            ab.append(E.row.chars, len);
+            ab.append(E.row[y].chars, len);
         }
         ab.append("\x1b[K"); // clear lines as we draw
         if (y < E.screenrows - 1)
