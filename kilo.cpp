@@ -7,6 +7,8 @@
 #include <cstring>     // For strerror
 #include <sys/ioctl.h> // To get terminal dimensions
 #include <stdio.h>
+#include <string>
+#include <vector>
 
 /** Data */
 struct erow
@@ -21,7 +23,7 @@ struct editorConfig
     int screenrows;
     int screencols;
     int numrows;
-    erow row;
+    erow *row;
     struct termios orig_termios;
 };
 struct editorConfig E;
@@ -419,7 +421,7 @@ void initEditor()
     E.cx = 0;
     E.cy = 0;
     E.numrows = 0;
-    // E.row = nullptr;
+    E.row = nullptr;
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
         die("getWindowSize");
 }
