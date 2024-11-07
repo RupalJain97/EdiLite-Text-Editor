@@ -12,6 +12,7 @@
 // struct termios orig_termios;
 struct editorConfig
 {
+    int cx, cy;
     int screenrows;
     int screencols;
     struct termios orig_termios;
@@ -20,6 +21,7 @@ struct editorConfig E;
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
+#define KILO_VERSION "0.0.1"
 
 /** Error Handling */
 // TODO
@@ -150,8 +152,29 @@ void editorDrawRows(std::string &ab)
 {
     for (int y = 0; y < E.screenrows; y++)
     {
-        // write(STDOUT_FILENO, "~", 1);
-        ab.append("~");
+        if (y == E.screenrows / 3)
+        {
+            // Display the welcome message a third of the way down
+            char welcome[80];
+            int welcomelen = snprintf(welcome, sizeof(welcome), "Kilo editor -- version %s", KILO_VERSION);
+            if (welcomelen > E.screencols)
+                welcomelen = E.screencols;
+
+            int padding = (E.screencols - welcomelen) / 2;
+            if (padding)
+            {
+                ab.append("~");
+                padding--;
+            }
+            while (padding--)
+                ab.append(" ");
+            ab.append(welcome, welcomelen);
+        }
+        else
+        {
+            ab.append("~");
+        }
+        ab.append("\x1b[K"); // clear lines as we draw
         if (y < E.screenrows - 1)
         {
             // write(STDOUT_FILENO, "\r\n", 2);
@@ -176,18 +199,21 @@ void editorRefreshScreen()
     */
     // write(STDOUT_FILENO, "\x1b[H", 3);
 
-
     std::string ab;
 
+    ab.append("\x1b[?25l"); // Hide the cursor
+
     // Append escape sequences to clear the screen and move cursor to top-left
-    ab.append("\x1b[2J");  // Clear the screen
-    ab.append("\x1b[H");   // Move cursor to the top-left corner
+    // ab.append("\x1b[2J");  // Clear the screen
+    ab.append("\x1b[H"); // Move cursor to the top-left corner
 
     editorDrawRows(ab);
 
     // write(STDOUT_FILENO, "\x1b[H", 3);
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
+
+    ab.append("\x1b[?25h"); // Hide the cursor
 
     // Write the buffer contents to standard output
     write(STDOUT_FILENO, ab.c_str(), ab.size());
@@ -197,6 +223,8 @@ void editorRefreshScreen()
 //  initialize all the fields in the E struct.
 void initEditor()
 {
+    E.cx = 0;
+    E.cy = 0;
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
         die("getWindowSize");
 }
