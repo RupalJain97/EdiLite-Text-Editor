@@ -415,9 +415,9 @@ void editorRefreshScreen()
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
 
-    // char buf[32];
-    // int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
-    // ab.append(buf);
+    char buf[32];
+    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, E.cx + 1);
+    ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
 
