@@ -35,7 +35,6 @@ void die(const char *s)
     exit(1);
 }
 
-
 void disableRawMode()
 {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
@@ -80,8 +79,12 @@ char editorReadKey()
 int getWindowSize(int *rows, int *cols)
 {
     struct winsize ws;
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
+    if (1 || ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
     {
+        // Move the cursor to the bottom-right corner as a fallback
+        if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12)
+            return -1;
+
         return -1;
     }
     else
@@ -139,6 +142,7 @@ void editorRefreshScreen()
 }
 
 /*** Init ***/
+//  initialize all the fields in the E struct.
 void initEditor()
 {
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
