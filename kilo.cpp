@@ -102,7 +102,8 @@ int getCursorPosition(int *rows, int *cols)
     // Check response format and parse
     if (buf[0] != '\x1b' || buf[1] != '[')
         return -1;
-    if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
+    if (sscanf(&buf[2], "%d;%d", rows, cols) != 2)
+        return -1;
 
     editorReadKey();
     return -1;
@@ -149,7 +150,11 @@ void editorDrawRows()
 {
     for (int y = 0; y < E.screenrows; y++)
     {
-        write(STDOUT_FILENO, "~\r\n", 3); // Draw a tilde at the start of each line
+        write(STDOUT_FILENO, "~", 1);
+        if (y < E.screenrows - 1)
+        {
+            write(STDOUT_FILENO, "\r\n", 2);
+        }
     }
 }
 
