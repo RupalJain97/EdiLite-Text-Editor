@@ -264,6 +264,9 @@ void editorOpen(const char *filename)
 /*** Input ***/
 void editorMoveCursor(int key)
 {
+    // Check if the cursor is within a valid line; otherwise, set `row` to `nullptr`
+    erow *row = (E.cy >= E.numrows) ? nullptr : &E.row[E.cy];
+
     switch (key)
     {
     case ARROW_LEFT:
@@ -273,10 +276,10 @@ void editorMoveCursor(int key)
         }
         break;
     case ARROW_RIGHT:
-        // if (E.cx != E.screencols - 1)
-        // {
+        if (row && E.cx < row->size)
+        {
             E.cx++;
-        // }
+        }
         break;
     case ARROW_UP:
         if (E.cy != 0)
@@ -290,6 +293,13 @@ void editorMoveCursor(int key)
             E.cy++;
         }
         break;
+    }
+
+    row = (E.cy >= E.numrows) ? nullptr : &E.row[E.cy];
+    int rowlen = row ? row->size : 0;
+    if (E.cx > rowlen)
+    {
+        E.cx = rowlen;
     }
 }
 
