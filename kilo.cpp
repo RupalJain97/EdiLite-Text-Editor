@@ -221,30 +221,40 @@ int getWindowSize(int *rows, int *cols)
 }
 
 /*** file i/o ***/
-// Open a file and load its contents into the editor
-void editorOpen(/*const char *filename*/)
-{
-    // FILE *fp = fopen(filename, "r");
-    // if (!fp) die("fopen");
 
-    char *line = "Hello, World!";
-    // size_t linecap = 0;
+// Append a new row to the editor's row array
+void editorAppendRow(const char *s, size_t len)
+{
+    E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
+    int at = E.numrows;
+
+    E.row[at].size = len;
+    E.row[at].chars = (char *)malloc(len + 1);
+    memcpy(E.row[at].chars, s, len);
+    E.row[at].chars[len] = '\0';
+    E.numrows++;
+}
+
+// Open a file and load its contents into the editor
+void editorOpen(const char *filename)
+{
+    FILE *fp = fopen(filename, "r");
+    if (!fp)
+        die("fopen");
+
+    char *line = nullptr;
+    size_t linecap = 0;
     ssize_t linelen = 13;
 
-    E.row.size = linelen;
-    E.row.chars = (char*) malloc(linelen + 1);
-    memcpy(E.row.chars, line, linelen);
-    E.row.chars[linelen] = '\0';
-    E.numrows = 1;
+    while ((linelen = getline(&line, &linecap, fp)) != -1)
+    {
+        while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
+            linelen--;
+        editorAppendRow(line, linelen);
+    }
 
-    // while ((linelen = getline(&line, &linecap, fp)) != -1) {
-    //     while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
-    //         linelen--;
-    //     editorAppendRow(line, linelen);
-    // }
-
-    // free(line);
-    // fclose(fp);
+    free(line);
+    fclose(fp);
 }
 
 /*** Input ***/
@@ -321,27 +331,37 @@ void editorDrawRows(std::string &ab)
 {
     for (int y = 0; y < E.screenrows; y++)
     {
-        if (y == E.screenrows / 3)
+        if (y >= E.numrows)
         {
-            // Display the welcome message a third of the way down
-            char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome), "Kilo editor -- version %s", KILO_VERSION);
-            if (welcomelen > E.screencols)
-                welcomelen = E.screencols;
+            if (E.numrows == 0 && y == E.screenrows / 3)
+            {
+                // Display the welcome message a third of the way down
+                char welcome[80];
+                int welcomelen = snprintf(welcome, sizeof(welcome), "Kilo editor -- version %s", KILO_VERSION);
+                if (welcomelen > E.screencols)
+                    welcomelen = E.screencols;
 
-            int padding = (E.screencols - welcomelen) / 2;
-            if (padding)
+                int padding = (E.screencols - welcomelen) / 2;
+                if (padding)
+                {
+                    ab.append("~");
+                    padding--;
+                }
+                while (padding--)
+                    ab.append(" ");
+                ab.append(welcome, welcomelen);
+            }
+            else
             {
                 ab.append("~");
-                padding--;
             }
-            while (padding--)
-                ab.append(" ");
-            ab.append(welcome, welcomelen);
         }
         else
         {
-            ab.append("~");
+            int len = E.row.size;
+            if (len > E.screencols)
+                len = E.screencols;
+            ab.append(E.row.chars, len);
         }
         ab.append("\x1b[K"); // clear lines as we draw
         if (y < E.screenrows - 1)
@@ -382,9 +402,9 @@ void editorRefreshScreen()
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
 
-    char buf[32];
-    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
-    ab.append(buf);
+    // char buf[32];
+    // int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+    // ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
 
@@ -414,7 +434,10 @@ int main()
     enableRawMode();
     initEditor();
 
-    editorOpen();
+    if (argc >= 2)
+    {
+        editorOpen(argv[1]);
+    }
 
     while (1)
     {
