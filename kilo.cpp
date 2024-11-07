@@ -222,8 +222,7 @@ int getWindowSize(int *rows, int *cols)
     }
 }
 
-/*** file i/o ***/
-
+/*** row operations ***/
 // Append a new row to the editor's row array
 void editorAppendRow(const char *s, size_t len)
 {
@@ -237,6 +236,7 @@ void editorAppendRow(const char *s, size_t len)
     E.numrows++;
 }
 
+/*** file i/o ***/
 // Open a file and load its contents into the editor
 void editorOpen(const char *filename)
 {
