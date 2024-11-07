@@ -83,18 +83,37 @@ int getCursorPosition(int *rows, int *cols)
 
     if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4)
         return -1;
-    
+
     // Read the response into the buffer
-    while (i < sizeof(buf) - 1) {
-        if (read(STDIN_FILENO, &buf[i], 1) != 1) break;
-        if (buf[i] == 'R') break;  // 'R' signifies the end of the response
+    while (i < sizeof(buf) - 1)
+    {
+        if (read(STDIN_FILENO, &buf[i], 1) != 1)
+            break;
+        if (buf[i] == 'R')
+            break; // 'R' signifies the end of the response
         i++;
     }
-    buf[i] = '\0';  // Null-terminate the buffer
+    buf[i] = '\0'; // Null-terminate the buffer
 
     // Print the buffer contents (response from terminal)
     std::cout << "\r\nResponse: '" << &buf[1] << "'\r\n";
 
+    // Check response format and parse
+    if (buf[0] != '\x1b' || buf[1] != '[')
+        return -1;
+    // if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
+
+    // Extract rows and columns from the response
+    try
+    {
+        size_t semicolon;
+        *rows = std::stoi(buf.substr(2), &semicolon);
+        *cols = std::stoi(buf.substr(semicolon + 3));
+    }
+    catch (e)
+    {
+        return -1;
+    }
 
     // std::cout << "\r\n";
     // char c;
