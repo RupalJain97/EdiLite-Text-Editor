@@ -146,14 +146,16 @@ void editorProcessKeypress()
 }
 
 /*** Output ***/
-void editorDrawRows()
+void editorDrawRows(std::string &ab)
 {
     for (int y = 0; y < E.screenrows; y++)
     {
-        write(STDOUT_FILENO, "~", 1);
+        // write(STDOUT_FILENO, "~", 1);
+        ab.append("~");
         if (y < E.screenrows - 1)
         {
-            write(STDOUT_FILENO, "\r\n", 2);
+            // write(STDOUT_FILENO, "\r\n", 2);
+            ab.append("\r\n");
         }
     }
 }
@@ -165,17 +167,30 @@ void editorRefreshScreen()
 
     The 4 in our write() call means we are writing 4 bytes out to the terminal. The first byte is \x1b, which is the escape character, or 27 in decimal. (Try and remember \x1b, we will be using it a lot.) The other three bytes are [2J.
     */
-    write(STDOUT_FILENO, "\x1b[2J", 4);
+    // write(STDOUT_FILENO, "\x1b[2J", 4);
 
     /*
     reposition the cursor which is at the top-left corner so that we’re ready to draw the editor interface from top to bottom.
 
     if you have an 80×24 size terminal and you want the cursor in the center of the screen, you could use the command <esc>[12;40H. (Multiple arguments are separated by a ; character.) The default arguments for H both happen to be 1.
     */
-    write(STDOUT_FILENO, "\x1b[H", 3);
+    // write(STDOUT_FILENO, "\x1b[H", 3);
+
+
+    std::string ab;
+
+    // Append escape sequences to clear the screen and move cursor to top-left
+    ab.append("\x1b[2J");  // Clear the screen
+    ab.append("\x1b[H");   // Move cursor to the top-left corner
 
     editorDrawRows();
-    write(STDOUT_FILENO, "\x1b[H", 3);
+
+    // write(STDOUT_FILENO, "\x1b[H", 3);
+    // Move the cursor back to the top-left corner
+    ab.append("\x1b[H");
+
+    // Write the buffer contents to standard output
+    write(STDOUT_FILENO, ab.c_str(), ab.size());
 }
 
 /*** Init ***/
