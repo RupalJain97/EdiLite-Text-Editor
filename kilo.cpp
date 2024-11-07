@@ -426,7 +426,7 @@ void initEditor()
         die("getWindowSize");
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     std::cout << "Welcome to the text Editor\n";
     // std::cout << "This is the raw mode.\n";
