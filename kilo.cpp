@@ -276,7 +276,7 @@ void editorUpdateRow(erow *row)
     row->rsize = idx;
 }
 
-void editorRowInsertChar(erow &row, int at, char c)
+void editorRowInsertChar(erow* row, int at, char c)
 {
     // Ensure 'at' is within bounds
     if (at < 0 || at > row.size)
