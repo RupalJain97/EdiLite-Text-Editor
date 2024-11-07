@@ -10,7 +10,12 @@
 #include <string>
 #include <vector>
 #include <time.h>
-#include <cstdarg>  // For va_list, va_start, va_end
+#include <cstdarg> // For va_list, va_start, va_end
+
+/*** defines ***/
+#define CTRL_KEY(k) ((k) & 0x1f)
+#define KILO_VERSION "0.0.1"
+#define KILO_TAB_STOP 8
 
 /** Data */
 struct erow
@@ -38,11 +43,6 @@ struct editorConfig
 };
 struct editorConfig E;
 
-/*** defines ***/
-#define CTRL_KEY(k) ((k) & 0x1f)
-#define KILO_VERSION "0.0.1"
-#define KILO_TAB_STOP 8
-
 enum editorKey
 {
     ARROW_LEFT = 1000,
@@ -56,11 +56,7 @@ enum editorKey
     PAGE_DOWN
 };
 
-/** Error Handling */
-// TODO
-
 /** Terminal */
-
 void die(const char *s)
 {
     /* Clear the screen on exit */
@@ -280,6 +276,21 @@ void editorUpdateRow(erow *row)
     row->rsize = idx;
 }
 
+void editorRowInsertChar(erow &row, int at, char c)
+{
+    // Ensure 'at' is within bounds
+    if (at < 0 || at > row.size)
+        at = row.size;
+
+    row->chars.resize(row->size + 1); // Adjust size for new char + null byte
+    memmove(&row->chars[at + 1], &row->chars[at], row->size - at);
+    row->chars[at] = c;
+    row->size++;
+
+    // Update render vector and rsize accordingly
+    editorUpdateRow(row);
+}
+
 // Append a new row to the editor's row array
 void editorAppendRow(const char *s, size_t len)
 {
@@ -295,6 +306,17 @@ void editorAppendRow(const char *s, size_t len)
     E.row[at].render = nullptr;
     editorUpdateRow(&E.row[at]);
     E.numrows++;
+}
+
+/*** editor operations ***/
+void editorInsertChar(int c)
+{
+    if (E.cy == E.numrows)
+    {
+        editorAppendRow("", 0); // Append a new empty row if needed
+    }
+    editorRowInsertChar(&E.row[E.cy], E.cx, c);
+    E.cx++;
 }
 
 /*** file i/o ***/
@@ -420,6 +442,10 @@ void editorProcessKeypress()
     case ARROW_LEFT:
     case ARROW_RIGHT:
         editorMoveCursor(c);
+        break;
+
+    default:
+        editorInsertChar(c);
         break;
     }
 }
