@@ -279,8 +279,8 @@ void editorUpdateRow(erow *row)
 void editorRowInsertChar(erow* row, int at, char c)
 {
     // Ensure 'at' is within bounds
-    if (at < 0 || at > row.size)
-        at = row.size;
+    if (at < 0 || at > row->size)
+        at = row->size;
 
     row->chars.resize(row->size + 1); // Adjust size for new char + null byte
     memmove(&row->chars[at + 1], &row->chars[at], row->size - at);
