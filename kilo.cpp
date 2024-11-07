@@ -183,7 +183,7 @@ void editorRefreshScreen()
     ab.append("\x1b[2J");  // Clear the screen
     ab.append("\x1b[H");   // Move cursor to the top-left corner
 
-    editorDrawRows();
+    editorDrawRows(ab);
 
     // write(STDOUT_FILENO, "\x1b[H", 3);
     // Move the cursor back to the top-left corner
