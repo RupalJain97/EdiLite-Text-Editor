@@ -282,7 +282,7 @@ void editorRowInsertChar(erow* row, int at, char c)
     if (at < 0 || at > row->size)
         at = row->size;
 
-    row->chars.resize(row->size + 1); // Adjust size for new char + null byte
+    row->chars = (char*)realloc(row->chars, row->size + 2); // Adjust size for new char + null byte
     memmove(&row->chars[at + 1], &row->chars[at], row->size - at);
     row->chars[at] = c;
     row->size++;
