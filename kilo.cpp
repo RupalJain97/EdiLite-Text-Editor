@@ -45,6 +45,7 @@ struct editorConfig E;
 
 enum editorKey
 {
+    BACKSPACE = 127,
     ARROW_LEFT = 1000,
     ARROW_RIGHT,
     ARROW_UP,
@@ -55,6 +56,9 @@ enum editorKey
     PAGE_UP,
     PAGE_DOWN
 };
+
+/*** prototypes ***/
+void editorSetStatusMessage(const char* fmt, ...);
 
 /** Terminal */
 void die(const char *s)
@@ -276,13 +280,13 @@ void editorUpdateRow(erow *row)
     row->rsize = idx;
 }
 
-void editorRowInsertChar(erow* row, int at, char c)
+void editorRowInsertChar(erow *row, int at, char c)
 {
     // Ensure 'at' is within bounds
     if (at < 0 || at > row->size)
         at = row->size;
 
-    row->chars = (char*)realloc(row->chars, row->size + 2); // Adjust size for new char + null byte
+    row->chars = (char *)realloc(row->chars, row->size + 2); // Adjust size for new char + null byte
     memmove(&row->chars[at + 1], &row->chars[at], row->size - at);
     row->chars[at] = c;
     row->size++;
@@ -320,6 +324,51 @@ void editorInsertChar(int c)
 }
 
 /*** file i/o ***/
+char *editorRowsToString(int *buflen)
+{
+    int totlen = 0;
+    for (int j = 0; j < E.numrows; j++)
+        totlen += E.row[j].size + 1;
+
+    *buflen = totlen;
+    char *buf = (char *)malloc(totlen);
+    char *p = buf;
+    for (int j = 0; j < E.numrows; j++)
+    {
+        memcpy(p, E.row[j].chars, E.row[j].size);
+        p += E.row[j].size;
+        *p = '\n';
+        p++;
+    }
+    return buf;
+}
+
+void editorSave()
+{
+    if (E.filename == nullptr)
+    {
+        editorSetStatusMessage("No filename specified. Cannot save file.");
+        return;
+    }
+
+    int len;
+    char *buf = editorRowsToString(&len);
+    int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
+    if (fd != -1)
+    {
+        if (ftruncate(fd, len) != -1 && write(fd, buf, len) == len)
+        {
+            close(fd);
+            free(buf);
+            editorSetStatusMessage("%d bytes written to disk", len);
+            return;
+        }
+        close(fd);
+    }
+    free(buf);
+    editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
+}
+
 // Open a file and load its contents into the editor
 void editorOpen(const char *filename)
 {
@@ -401,12 +450,20 @@ void editorProcessKeypress()
 
     switch (c)
     {
+    case '\r':
+        /* TODO */
+        break;
     case CTRL_KEY('q'):
         /* Clear the screen when user presses Ctrl-Q to quit */
-        std::cout << "Exiting editor...\n";
+        // std::cout << "Exiting editor...\n";
         write(STDOUT_FILENO, "\x1b[2J", 4);
         write(STDOUT_FILENO, "\x1b[H", 3);
+        // clearScreen();
         exit(0);
+        break;
+
+    case CTRL_KEY('s'):
+        editorSave();
         break;
 
     case HOME_KEY:
@@ -416,6 +473,12 @@ void editorProcessKeypress()
     case END_KEY:
         if (E.cy < E.numrows)
             E.cx = E.row[E.cy].size;
+        break;
+
+    case BACKSPACE:
+    case CTRL_KEY('h'):
+    case DEL_KEY:
+        /* TODO */
         break;
 
     case PAGE_UP:
@@ -444,10 +507,26 @@ void editorProcessKeypress()
         editorMoveCursor(c);
         break;
 
+    case CTRL_KEY('l'):
+    case '\x1b':
+        break;
+
     default:
         editorInsertChar(c);
         break;
     }
+}
+
+void editorSetStatusMessage(const char *fmt, ...)
+{
+    char msg[80];
+    va_list args;
+    va_start(args, fmt);
+    std::vsnprintf(msg, sizeof(msg), fmt, args);
+    va_end(args);
+
+    E.statusmsg = msg;
+    E.statusmsg_time = std::time(nullptr);
 }
 
 /*** Output ***/
@@ -643,7 +722,7 @@ int main(int argc, char *argv[])
         editorOpen(argv[1]);
     }
 
-    editorSetStatusMessage("HELP: Ctrl-Q = quit");
+    editorSetStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit");
     while (1)
     {
         editorRefreshScreen();
