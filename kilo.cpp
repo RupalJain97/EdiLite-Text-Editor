@@ -63,7 +63,7 @@ enum editorKey
 /*** prototypes ***/
 void editorSetStatusMessage(const char *fmt, ...);
 void editorRefreshScreen();
-std::string editorPrompt(const std::string &prompt, void (*callback)(const std::string &, int) = nullptr);
+std::string editorPrompt(const std::string &prompt, void (*callback)(const std::string &, int));
 
 /** Terminal */
 void die(const char *s)
