@@ -306,9 +306,7 @@ void editorInsertRow(int at, const char *s, size_t len)
         return;
 
     E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
-    std::memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
-
-    // int at = E.numrows;
+    std::memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
     E.row[at].size = len;
     E.row[at].chars = (char *)malloc(len + 1);
@@ -544,7 +542,7 @@ void editorProcessKeypress()
     case '\r':
         editorInsertNewline();
         break;
-        
+
     case CTRL_KEY('q'):
         if (E.dirty && quit_times > 0)
         {
