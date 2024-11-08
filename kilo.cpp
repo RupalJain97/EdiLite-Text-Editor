@@ -453,7 +453,7 @@ void editorSave()
 {
     if (E.filename == nullptr)
     {
-        E.filename = strdup(editorPrompt("Save as: %s (ESC to cancel)").c_str());
+        E.filename = strdup(editorPrompt("Save as: %s (ESC to cancel)", NULL).c_str());
         if (E.filename == nullptr || E.filename[0] == '\0')
         { // Check for cancel
             editorSetStatusMessage("Save aborted");
