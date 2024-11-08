@@ -300,10 +300,15 @@ void editorRowInsertChar(erow *row, int at, char c)
 }
 
 // Append a new row to the editor's row array
-void editorAppendRow(const char *s, size_t len)
+void editorInsertRow(int at, const char *s, size_t len)
 {
+    if (at < 0 || at > E.numrows)
+        return;
+
     E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
-    int at = E.numrows;
+    std::memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+
+    // int at = E.numrows;
 
     E.row[at].size = len;
     E.row[at].chars = (char *)malloc(len + 1);
@@ -360,7 +365,7 @@ void editorInsertChar(int c)
 {
     if (E.cy == E.numrows)
     {
-        editorAppendRow("", 0); // Append a new empty row if needed
+        editorInsertRow(E.numrows, "", 0); // Append a new empty row if needed
     }
     editorRowInsertChar(&E.row[E.cy], E.cx, c);
     E.cx++;
@@ -386,6 +391,27 @@ void editorDelChar()
         editorDelRow(E.cy);
         E.cy--;
     }
+}
+
+void editorInsertNewline()
+{
+    if (E.cx == 0)
+    {
+        editorInsertRow(E.cy, "", 0);
+    }
+    else
+    {
+        erow *row = &E.row[E.cy];
+        editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
+
+        row->size = E.cx;
+        row->chars[row->size] = '\0';
+        editorUpdateRow(row);
+    }
+
+    E.cy++;
+    E.cx = 0;
+    // E.dirty++;
 }
 
 /*** file i/o ***/
@@ -448,7 +474,7 @@ void editorOpen(const char *filename)
     {
         while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
             linelen--;
-        editorAppendRow(line, linelen);
+        editorInsertRow(E.numrows, line, linelen);
     }
 
     free(line);
@@ -516,8 +542,9 @@ void editorProcessKeypress()
     switch (c)
     {
     case '\r':
-        /* TODO */
+        editorInsertNewline();
         break;
+        
     case CTRL_KEY('q'):
         if (E.dirty && quit_times > 0)
         {
