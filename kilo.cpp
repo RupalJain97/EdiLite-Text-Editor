@@ -260,18 +260,37 @@ int editorSyntaxToColor(int hl)
     }
 }
 
+int is_separator(int c) {
+    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL;
+}
+
 void editorUpdateSyntax(erow *row)
 {
     // Resize hl array to match the row's render size
     row->hl = (unsigned char *)realloc(row->hl, row->rsize);
     memset(row->hl, HL_NORMAL, row->rsize); // Set all to normal initially
 
-    for (int i = 0; i < row->rsize; i++)
+    int prev_sep = 1; // Track whether the previous character was a separator
+    int i = 0;
+
+    while (i < row->rsize)
     {
-        if (isdigit(row->render[i]))
+        char c = row->render[i];
+        unsigned char prev_hl = (i > 0) ? row->hl[i - 1] : HL_NORMAL;
+
+        // Highlight numbers if preceded by a separator or another number character
+        if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) ||
+            (c == '.' && prev_hl == HL_NUMBER))
         {
-            row->hl[i] = HL_NUMBER; // Highlight numbers
+            row->hl[i] = HL_NUMBER;
+            i++;
+            prev_sep = 0;
+            continue;
         }
+
+        // Update `prev_sep` for the next iteration
+        prev_sep = is_separator(c);
+        i++;
     }
 }
 
