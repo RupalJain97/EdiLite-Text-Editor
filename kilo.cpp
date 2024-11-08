@@ -17,6 +17,7 @@
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define KILO_VERSION "0.0.1"
 #define KILO_TAB_STOP 8
+#define KILO_QUIT_TIMES 3
 
 /** Data */
 struct erow
@@ -38,6 +39,7 @@ struct editorConfig
     int numrows;
     erow *row;
     char *filename;
+    int dirty;
     struct termios orig_termios;
     char statusmsg[80];
     time_t statusmsg_time;
@@ -294,6 +296,7 @@ void editorRowInsertChar(erow *row, int at, char c)
 
     // Update render vector and rsize accordingly
     editorUpdateRow(row);
+    E.dirty++;
 }
 
 // Append a new row to the editor's row array
@@ -311,6 +314,7 @@ void editorAppendRow(const char *s, size_t len)
     E.row[at].render = nullptr;
     editorUpdateRow(&E.row[at]);
     E.numrows++;
+    E.dirty++;
 }
 
 /*** editor operations ***/
@@ -356,8 +360,10 @@ void editorSave()
     std::string buffer = editorRowsToString(len);
 
     std::ofstream file(E.filename, std::ios::out | std::ios::trunc);
-    if (file) {
+    if (file)
+    {
         file.write(buffer.c_str(), len);
+        E.dirty = 0;
         editorSetStatusMessage("%d bytes written to disk", len);
     }
     else
@@ -387,6 +393,7 @@ void editorOpen(const char *filename)
 
     free(line);
     fclose(fp);
+    E.dirty = 0;
 }
 
 /*** Input ***/
@@ -443,6 +450,7 @@ void editorMoveCursor(int key)
 
 void editorProcessKeypress()
 {
+    static int quit_times = KILO_QUIT_TIMES;
     int c = editorReadKey();
 
     switch (c)
@@ -451,11 +459,16 @@ void editorProcessKeypress()
         /* TODO */
         break;
     case CTRL_KEY('q'):
-        /* Clear the screen when user presses Ctrl-Q to quit */
-        // std::cout << "Exiting editor...\n";
+        if (E.dirty && quit_times > 0)
+        {
+            editorSetStatusMessage("WARNING!!! File has unsaved changes. "
+                                   "Press Ctrl-Q %d more times to quit.",
+                                   quit_times);
+            quit_times--;
+            return;
+        }
         write(STDOUT_FILENO, "\x1b[2J", 4);
         write(STDOUT_FILENO, "\x1b[H", 3);
-        // clearScreen();
         exit(0);
         break;
 
@@ -512,6 +525,7 @@ void editorProcessKeypress()
         editorInsertChar(c);
         break;
     }
+    quit_times = KILO_QUIT_TIMES;
 }
 
 /*** Output ***/
@@ -586,7 +600,7 @@ void editorDrawStatusBar(std::string &ab)
     ab.append("\x1b[7m"); // Invert colors
     char status[80], rstatus[80];
     int len = snprintf(status, sizeof(status), "%.20s - %d lines",
-                       E.filename ? E.filename : "[No Name]", E.numrows);
+                       E.filename ? E.filename : "[No Name]", E.numrows, E.dirty ? "(modified)" : "");
 
     int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d",
                         E.cy + 1, E.numrows);
@@ -690,6 +704,7 @@ void initEditor()
     E.filename = nullptr;
     E.statusmsg[0] = '\0';
     E.statusmsg_time = 0;
+    E.dirty = 0;
 }
 
 int main(int argc, char *argv[])
