@@ -410,9 +410,9 @@ void editorDelChar()
 
 void editorInsertNewline()
 {
-    if (E.cy == E.numrows) {
-        editorInsertRow(E.numrows, "", 0); // Insert an empty row if at the end of file
-    }
+    // if (E.cy == E.numrows) {
+    //     editorInsertRow(E.numrows, "", 0); // Insert an empty row if at the end of file
+    // }
     else if (E.cx == 0)
     {
         editorInsertRow(E.cy, "", 0);
@@ -559,7 +559,7 @@ void editorOpen(const char *filename)
 
     char *line = nullptr;
     size_t linecap = 0;
-    ssize_t linelen = 13;
+    ssize_t linelen;
 
     while ((linelen = getline(&line, &linecap, fp)) != -1)
     {
@@ -633,7 +633,7 @@ void editorProcessKeypress()
     switch (c)
     {
     case '\r':
-        // editorInsertNewline();
+        editorInsertNewline();
         break;
 
     case CTRL_KEY('q'):
