@@ -623,12 +623,12 @@ void editorProcessKeypress()
 
 std::string editorPrompt(const std::string &prompt)
 {
-    size_t bufsize = 0;
+    size_t buflen = 0;
     std::string buf;
     buf.reserve(128);
 
-    size_t buflen = 0;
-    buf[0] = '\0';
+    // size_t buflen = 0;
+    // buf[0] = '\0';
 
     while (true)
     {
@@ -658,16 +658,16 @@ std::string editorPrompt(const std::string &prompt)
         else if (!iscntrl(c) && c < 128)
         { // Add printable character
 
-            if (buflen == bufsize - 1)
-            {
-                bufsize *= 2;
-                buf = realloc(buf, bufsize);
-            }
-            buf[buflen++] = c;
-            buf[buflen] = '\0';
+            // if (buflen == bufsize - 1)
+            // {
+            //     bufsize *= 2;
+            //     buf = realloc(buf, bufsize);
+            // }
+            // buf[buflen++] = c;
+            // buf[buflen] = '\0';
 
-            // buf += c;
-            // buflen++;
+            buf += c;
+            buflen++;
         }
     }
 }
