@@ -62,6 +62,8 @@ enum editorKey
 
 /*** prototypes ***/
 void editorSetStatusMessage(const char *fmt, ...);
+void editorRefreshScreen();
+std::string editorPrompt(const std::string &prompt);
 
 /** Terminal */
 void die(const char *s)
@@ -436,8 +438,12 @@ void editorSave()
 {
     if (E.filename == nullptr)
     {
-        editorSetStatusMessage("No filename specified. Cannot save file.");
-        return;
+        E.filename = strdup(editorPrompt("Save as: %s (ESC to cancel)").c_str());
+        if (E.filename == nullptr || E.filename[0] == '\0')
+        { // Check for cancel
+            editorSetStatusMessage("Save aborted");
+            return;
+        }
     }
 
     int len;
@@ -613,6 +619,54 @@ void editorProcessKeypress()
         break;
     }
     quit_times = KILO_QUIT_TIMES;
+}
+
+std::string editorPrompt(const std::string &prompt)
+{
+    size_t buflen = 0;
+    std::string buf;
+    buf.reserve(128);
+
+    while (true)
+    {
+        editorSetStatusMessage(prompt.c_str(), buf.c_str());
+        editorRefreshScreen();
+
+        int c = editorReadKey();
+
+        if (c == '\x1b')
+        { // ESC to cancel
+            editorSetStatusMessage("");
+            return "";
+        }
+        else if (c == '\r')
+        { // Enter to confirm
+            if (!buf.empty())
+            {
+                editorSetStatusMessage("");
+                return buf;
+            }
+        }
+        else if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE)
+        { // Backspace
+            if (!buf.empty())
+                buf.pop_back();
+        }
+        else if (!iscntrl(c) && c < 128)
+        { // Add printable character
+
+            if (buflen == bufsize - 1)
+            {
+                bufsize *= 2;
+                buf = realloc(buf, bufsize);
+            }
+            buf[buflen++] = c;
+            buf[buflen] = '\0';
+
+            // buf += c;
+            // buflen++;
+        }
+    }
 }
 
 /*** Output ***/
