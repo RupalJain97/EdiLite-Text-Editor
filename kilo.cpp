@@ -11,6 +11,7 @@
 #include <vector>
 #include <time.h>
 #include <cstdarg> // For va_list, va_start, va_end
+#include <fstream>
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
