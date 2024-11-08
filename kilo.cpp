@@ -26,6 +26,7 @@ struct erow
     int rsize;
     char *chars;
     char *render;
+    unsigned char *hl;
 };
 
 struct editorConfig
@@ -58,6 +59,12 @@ enum editorKey
     END_KEY,
     PAGE_UP,
     PAGE_DOWN
+};
+
+enum editorHighlight
+{
+    HL_NORMAL = 0,
+    HL_NUMBER
 };
 
 /*** prototypes ***/
@@ -238,6 +245,33 @@ int getWindowSize(int *rows, int *cols)
     }
 }
 
+/*** syntax highlighting ***/
+int editorSyntaxToColor(int hl)
+{
+    switch (hl)
+    {
+    case HL_NUMBER:
+        return 31; // Red color for numbers
+    default:
+        return 37; // White (default) for normal text
+    }
+}
+
+void editorUpdateSyntax(erow *row)
+{
+    // Resize hl array to match the row's render size
+    row->hl = (unsigned char *)realloc(row->hl, row->rsize);
+    memset(row->hl, HL_NORMAL, row->rsize); // Set all to normal initially
+
+    for (int i = 0; i < row->rsize; i++)
+    {
+        if (isdigit(row->render[i]))
+        {
+            row->hl[i] = HL_NUMBER; // Highlight numbers
+        }
+    }
+}
+
 /*** row operations ***/
 int editorRowCxToRx(erow *row, int cx)
 {
@@ -298,6 +332,8 @@ void editorUpdateRow(erow *row)
 
     row->render[idx] = '\0';
     row->rsize = idx;
+
+    editorUpdateSyntax();
 }
 
 void editorRowInsertChar(erow *row, int at, char c)
@@ -332,6 +368,7 @@ void editorInsertRow(int at, const char *s, size_t len)
 
     E.row[at].rsize = 0;
     E.row[at].render = nullptr;
+    E.row[at].hl = nullptr;
     editorUpdateRow(&E.row[at]);
     E.numrows++;
     E.dirty++;
@@ -352,6 +389,7 @@ void editorFreeRow(erow *row)
 {
     free(row->render);
     free(row->chars);
+    free(row->hl);
 }
 
 void editorDelRow(int at)
@@ -817,14 +855,40 @@ void editorDrawRows(std::string &ab)
                 len = 0;
             if (len > E.screencols)
                 len = E.screencols;
-            ab.append(&E.row[filerow].render[E.coloff], len);
+            // ab.append(&E.row[filerow].render[E.coloff], len);
+
+            char *c = &E.row[filerow].render[E.coloff];
+            unsigned char *hl = &E.row[filerow].hl[E.coloff];
+
+            int current_color = -1;
+            for (int j = 0; j < len; j++)
+            {
+                if (hl[j] == HL_NORMAL)
+                {
+                    if (current_color != -1)
+                    {
+                        ab.append("\x1b[39m"); // Reset color
+                        current_color = -1;
+                    }
+                    ab.append(1, c[j]);
+                }
+                else
+                {
+                    int color = editorSyntaxToColor(hl[j]);
+                    if (color != current_color)
+                    {
+                        char buf[16];
+                        int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
+                        ab.append(buf, clen); // Apply new color
+                        current_color = color;
+                    }
+                    ab.append(1, c[j]);
+                }
+            }
+            ab.append("\x1b[39m");
         }
-        ab.append("\x1b[K"); // clear lines as we draw
-                             // if (y < E.screenrows - 1)
-                             // {
-        // write(STDOUT_FILENO, "\r\n", 2);
+        ab.append("\x1b[K");
         ab.append("\r\n");
-        // }
     }
 }
 
