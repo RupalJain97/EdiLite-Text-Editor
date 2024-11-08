@@ -410,7 +410,10 @@ void editorDelChar()
 
 void editorInsertNewline()
 {
-    if (E.cx == 0)
+    if (E.cy == E.numrows) {
+        editorInsertRow(E.numrows, "", 0); // Insert an empty row if at the end of file
+    }
+    else if (E.cx == 0)
     {
         editorInsertRow(E.cy, "", 0);
     }
