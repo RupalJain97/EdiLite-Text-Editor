@@ -58,7 +58,7 @@ enum editorKey
 };
 
 /*** prototypes ***/
-void editorSetStatusMessage(const char* fmt, ...);
+void editorSetStatusMessage(const char *fmt, ...);
 
 /** Terminal */
 void die(const char *s)
@@ -352,21 +352,15 @@ void editorSave()
     }
 
     int len;
-    char *buf = editorRowsToString(&len);
-    int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
-    if (fd != -1)
-    {
-        if (ftruncate(fd, len) != -1 && write(fd, buf, len) == len)
-        {
-            close(fd);
-            free(buf);
-            editorSetStatusMessage("%d bytes written to disk", len);
-            return;
-        }
-        close(fd);
+    std::string buffer = editorRowsToString(len);
+
+    std::ofstream file(E.filename, std::ios::out | std::ios::trunc);
+    if (file) {
+        file.write(buffer.c_str(), len);
+        editorSetStatusMessage("%d bytes written to disk", len);
+    } else {
+        editorSetStatusMessage("Can't save! I/O error");
     }
-    free(buf);
-    editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
 }
 
 // Open a file and load its contents into the editor
@@ -515,18 +509,6 @@ void editorProcessKeypress()
         editorInsertChar(c);
         break;
     }
-}
-
-void editorSetStatusMessage(const char *fmt, ...)
-{
-    char msg[80];
-    va_list args;
-    va_start(args, fmt);
-    std::vsnprintf(msg, sizeof(msg), fmt, args);
-    va_end(args);
-
-    E.statusmsg = msg;
-    E.statusmsg_time = std::time(nullptr);
 }
 
 /*** Output ***/
