@@ -435,40 +435,6 @@ void editorInsertNewline()
     E.dirty++;
 }
 
-// void editorInsertNewline()
-// {
-//     if (E.cy == E.numrows)
-//     {
-//         // If the cursor is at the end of the file, insert a blank row at the end
-//         editorInsertRow(E.numrows, "", 0);
-//     }
-//     else if (E.cx == 0)
-//     {
-//         // If the cursor is at the beginning of a line, insert a new blank row above it
-//         editorInsertRow(E.cy, "", 0);
-//     }
-//     else
-//     {
-//         // Split the current line into two rows
-//         erow *row = &E.row[E.cy];
-
-//         // Insert new row with characters after the cursor position
-//         editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
-
-//         // Truncate the original row up to the cursor position
-//         row = &E.row[E.cy]; // Re-fetch pointer as realloc might have moved memory
-//         row->size = E.cx;
-//         row->chars[row->size] = '\0';
-
-//         editorUpdateRow(row); // Update rendering of the truncated row
-//     }
-
-//     // Move cursor to the beginning of the new row
-//     E.cy++;
-//     E.cx = 0;
-//     E.dirty++;
-// }
-
 /*** file i/o ***/
 std::string editorRowsToString(int &buflen)
 {
