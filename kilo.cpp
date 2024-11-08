@@ -337,36 +337,6 @@ void editorInsertRow(int at, const char *s, size_t len)
     E.dirty++;
 }
 
-// void editorInsertRow(int at, const char *s, size_t len)
-// {
-//     if (at < 0 || at > E.numrows)
-//         return;
-
-//     // Reallocate memory for one additional row
-//     E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
-//     if (E.row == nullptr)
-//         die("realloc"); // Check for allocation failure
-
-//     // Shift rows after 'at' to make space for the new row
-//     memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
-
-//     // Initialize the new row
-//     E.row[at].size = len;
-//     E.row[at].chars = (char *)malloc(len + 1);
-//     if (E.row[at].chars == nullptr)
-//         die("malloc"); // Check for allocation failure
-
-//     memcpy(E.row[at].chars, s, len);
-//     E.row[at].chars[len] = '\0';
-
-//     E.row[at].rsize = 0;
-//     E.row[at].render = nullptr;
-//     editorUpdateRow(&E.row[at]);
-
-//     E.numrows++;
-//     E.dirty++;
-// }
-
 void editorRowDelChar(erow *row, int at)
 {
     if (at < 0 || at >= row->size)
@@ -438,54 +408,25 @@ void editorDelChar()
     }
 }
 
-// void editorInsertNewline()
-// {
-//     if (E.cy == E.numrows) {
-//         editorInsertRow(E.numrows, "", 0); // Insert an empty row if at the end of file
-//     }
-//     else if (E.cx == 0)
-//     {
-//         editorInsertRow(E.cy, "", 0);
-//     }
-//     else
-//     {
-//         erow *row = &E.row[E.cy];
-//         editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
-
-//         row = &E.row[E.cy];
-//         row->size = E.cx;
-//         row->chars[row->size] = '\0';
-//         editorUpdateRow(row);
-//     }
-
-// }
-
 void editorInsertNewline()
 {
     if (E.cy == E.numrows)
     {
-        // If the cursor is at the end of the file, insert a blank row at the end
-        editorInsertRow(E.numrows, "", 0);
+        editorInsertRow(E.numrows, "", 0); // Insert an empty row if at the end of file
     }
     else if (E.cx == 0)
     {
-        // If the cursor is at the beginning of a line, insert a new blank row above it
         editorInsertRow(E.cy, "", 0);
     }
     else
     {
-        // Split the current line into two rows
         erow *row = &E.row[E.cy];
-
-        // Insert new row with characters after the cursor position
         editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
 
-        // Truncate the original row up to the cursor position
-        row = &E.row[E.cy]; // Re-fetch pointer as realloc might have moved memory
+        row = &E.row[E.cy];
         row->size = E.cx;
         row->chars[row->size] = '\0';
-
-        editorUpdateRow(row); // Update rendering of the truncated row
+        editorUpdateRow(row);
     }
 
     // Move cursor to the beginning of the new row
@@ -493,6 +434,40 @@ void editorInsertNewline()
     E.cx = 0;
     E.dirty++;
 }
+
+// void editorInsertNewline()
+// {
+//     if (E.cy == E.numrows)
+//     {
+//         // If the cursor is at the end of the file, insert a blank row at the end
+//         editorInsertRow(E.numrows, "", 0);
+//     }
+//     else if (E.cx == 0)
+//     {
+//         // If the cursor is at the beginning of a line, insert a new blank row above it
+//         editorInsertRow(E.cy, "", 0);
+//     }
+//     else
+//     {
+//         // Split the current line into two rows
+//         erow *row = &E.row[E.cy];
+
+//         // Insert new row with characters after the cursor position
+//         editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
+
+//         // Truncate the original row up to the cursor position
+//         row = &E.row[E.cy]; // Re-fetch pointer as realloc might have moved memory
+//         row->size = E.cx;
+//         row->chars[row->size] = '\0';
+
+//         editorUpdateRow(row); // Update rendering of the truncated row
+//     }
+
+//     // Move cursor to the beginning of the new row
+//     E.cy++;
+//     E.cx = 0;
+//     E.dirty++;
+// }
 
 /*** file i/o ***/
 std::string editorRowsToString(int &buflen)
