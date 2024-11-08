@@ -317,6 +317,17 @@ void editorAppendRow(const char *s, size_t len)
     E.dirty++;
 }
 
+void editorRowDelChar(erow *row, int at)
+{
+    if (at < 0 || at >= row->size)
+        return;
+
+    std::memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+    row->size--;
+    editorUpdateRow(row);
+    E.dirty++;
+}
+
 /*** editor operations ***/
 void editorInsertChar(int c)
 {
@@ -326,6 +337,18 @@ void editorInsertChar(int c)
     }
     editorRowInsertChar(&E.row[E.cy], E.cx, c);
     E.cx++;
+}
+
+void editorDelChar()
+{
+    if (E.cy == E.numrows)
+        return; // Return if at the end of the file
+    erow *row = &E.row[E.cy];
+    if (E.cx > 0)
+    {
+        editorRowDelChar(row, E.cx - 1); // Delete character to the left of the cursor
+        E.cx--;                          // Move cursor left
+    }
 }
 
 /*** file i/o ***/
@@ -488,7 +511,9 @@ void editorProcessKeypress()
     case BACKSPACE:
     case CTRL_KEY('h'):
     case DEL_KEY:
-        /* TODO */
+        if (c == DEL_KEY)
+            editorMoveCursor(ARROW_RIGHT);
+        editorDelChar();
         break;
 
     case PAGE_UP:
