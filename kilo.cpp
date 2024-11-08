@@ -633,7 +633,7 @@ void editorProcessKeypress()
     switch (c)
     {
     case '\r':
-        editorInsertNewline();
+        // editorInsertNewline();
         break;
 
     case CTRL_KEY('q'):
