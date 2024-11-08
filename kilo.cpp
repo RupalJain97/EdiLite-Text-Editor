@@ -333,7 +333,7 @@ void editorUpdateRow(erow *row)
     row->render[idx] = '\0';
     row->rsize = idx;
 
-    editorUpdateSyntax();
+    editorUpdateSyntax(row);
 }
 
 void editorRowInsertChar(erow *row, int at, char c)
