@@ -627,9 +627,6 @@ std::string editorPrompt(const std::string &prompt)
     std::string buf;
     buf.reserve(128);
 
-    // size_t buflen = 0;
-    // buf[0] = '\0';
-
     while (true)
     {
         editorSetStatusMessage(prompt.c_str(), buf.c_str());
@@ -657,15 +654,6 @@ std::string editorPrompt(const std::string &prompt)
         }
         else if (!iscntrl(c) && c < 128)
         { // Add printable character
-
-            // if (buflen == bufsize - 1)
-            // {
-            //     bufsize *= 2;
-            //     buf = realloc(buf, bufsize);
-            // }
-            // buf[buflen++] = c;
-            // buf[buflen] = '\0';
-
             buf += c;
             buflen++;
         }
