@@ -317,55 +317,55 @@ void editorRowInsertChar(erow *row, int at, char c)
 }
 
 // Append a new row to the editor's row array
-void editorInsertRow(int at, const char *s, size_t len)
-{
-    if (at < 0 || at > E.numrows)
-        return;
-
-    E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
-    std::memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
-
-    E.row[at].size = len;
-    E.row[at].chars = (char *)malloc(len + 1);
-    memcpy(E.row[at].chars, s, len);
-    E.row[at].chars[len] = '\0';
-
-    E.row[at].rsize = 0;
-    E.row[at].render = nullptr;
-    editorUpdateRow(&E.row[at]);
-    E.numrows++;
-    E.dirty++;
-}
-
 // void editorInsertRow(int at, const char *s, size_t len)
 // {
 //     if (at < 0 || at > E.numrows)
 //         return;
 
-//     // Reallocate memory for one additional row
 //     E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
-//     if (E.row == nullptr)
-//         die("realloc"); // Check for allocation failure
+//     std::memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
-//     // Shift rows after 'at' to make space for the new row
-//     memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
-
-//     // Initialize the new row
 //     E.row[at].size = len;
 //     E.row[at].chars = (char *)malloc(len + 1);
-//     if (E.row[at].chars == nullptr)
-//         die("malloc"); // Check for allocation failure
-
 //     memcpy(E.row[at].chars, s, len);
 //     E.row[at].chars[len] = '\0';
 
 //     E.row[at].rsize = 0;
 //     E.row[at].render = nullptr;
 //     editorUpdateRow(&E.row[at]);
-
 //     E.numrows++;
 //     E.dirty++;
 // }
+
+void editorInsertRow(int at, const char *s, size_t len)
+{
+    if (at < 0 || at > E.numrows)
+        return;
+
+    // Reallocate memory for one additional row
+    E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
+    if (E.row == nullptr)
+        die("realloc"); // Check for allocation failure
+
+    // Shift rows after 'at' to make space for the new row
+    memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
+
+    // Initialize the new row
+    E.row[at].size = len;
+    E.row[at].chars = (char *)malloc(len + 1);
+    if (E.row[at].chars == nullptr)
+        die("malloc"); // Check for allocation failure
+
+    memcpy(E.row[at].chars, s, len);
+    E.row[at].chars[len] = '\0';
+
+    E.row[at].rsize = 0;
+    E.row[at].render = nullptr;
+    editorUpdateRow(&E.row[at]);
+
+    E.numrows++;
+    E.dirty++;
+}
 
 void editorRowDelChar(erow *row, int at)
 {
