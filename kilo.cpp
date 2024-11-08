@@ -623,9 +623,12 @@ void editorProcessKeypress()
 
 std::string editorPrompt(const std::string &prompt)
 {
-    size_t buflen = 0;
+    size_t bufsize = 0;
     std::string buf;
     buf.reserve(128);
+
+    size_t buflen = 0;
+    buf[0] = '\0';
 
     while (true)
     {
