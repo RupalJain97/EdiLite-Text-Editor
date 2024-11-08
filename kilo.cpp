@@ -411,7 +411,7 @@ void editorInsertNewline()
 
     E.cy++;
     E.cx = 0;
-    // E.dirty++;
+    E.dirty++;
 }
 
 /*** file i/o ***/
