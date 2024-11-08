@@ -328,6 +328,33 @@ void editorRowDelChar(erow *row, int at)
     E.dirty++;
 }
 
+void editorFreeRow(erow *row)
+{
+    free(row->render);
+    free(row->chars);
+}
+
+void editorDelRow(int at)
+{
+    if (at < 0 || at >= E.numrows)
+        return;
+
+    editorFreeRow(&E.row[at]);
+    std::memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
+    E.numrows--;
+    E.dirty++;
+}
+
+void editorRowAppendString(erow *row, const char *s, size_t len)
+{
+    row->chars = (char *)realloc(row->chars, row->size + len + 1);
+    std::memcpy(&row->chars[row->size], s, len);
+    row->size += len;
+    row->chars[row->size] = '\0';
+    editorUpdateRow(row);
+    E.dirty++;
+}
+
 /*** editor operations ***/
 void editorInsertChar(int c)
 {
@@ -342,12 +369,22 @@ void editorInsertChar(int c)
 void editorDelChar()
 {
     if (E.cy == E.numrows)
-        return; // Return if at the end of the file
+        return;
+
+    if (E.cx == 0 && E.cy == 0)
+        return;
     erow *row = &E.row[E.cy];
     if (E.cx > 0)
     {
-        editorRowDelChar(row, E.cx - 1); // Delete character to the left of the cursor
-        E.cx--;                          // Move cursor left
+        editorRowDelChar(row, E.cx - 1);
+        E.cx--;
+    }
+    else
+    {
+        E.cx = E.row[E.cy - 1].size;
+        editorRowAppendString(&E.row[E.cy - 1], row->chars, row->size);
+        editorDelRow(E.cy);
+        E.cy--;
     }
 }
 
@@ -387,7 +424,7 @@ void editorSave()
     {
         file.write(buffer.c_str(), len);
         E.dirty = 0;
-        editorSetStatusMessage("%d bytes written to disk", len);
+        editorSetStatusMessage("%d bytes written to disk... File saved successfully", len);
     }
     else
     {
