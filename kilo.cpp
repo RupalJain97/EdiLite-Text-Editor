@@ -324,23 +324,23 @@ void editorInsertChar(int c)
 }
 
 /*** file i/o ***/
-char *editorRowsToString(int *buflen)
+std::string editorRowsToString(int &buflen)
 {
-    int totlen = 0;
-    for (int j = 0; j < E.numrows; j++)
-        totlen += E.row[j].size + 1;
-
-    *buflen = totlen;
-    char *buf = (char *)malloc(totlen);
-    char *p = buf;
+    buflen = 0;
     for (int j = 0; j < E.numrows; j++)
     {
-        memcpy(p, E.row[j].chars, E.row[j].size);
-        p += E.row[j].size;
-        *p = '\n';
-        p++;
+        buflen += E.row[j].size + 1; // +1 for newline character
     }
-    return buf;
+
+    std::string buffer;
+    buffer.reserve(buflen); // Reserve exact space to avoid reallocations
+
+    for (int j = 0; j < E.numrows; j++)
+    {
+        buffer.append(E.row[j].chars);
+        buffer.append("\n"); // Append newline
+    }
+    return buffer;
 }
 
 void editorSave()
@@ -358,7 +358,9 @@ void editorSave()
     if (file) {
         file.write(buffer.c_str(), len);
         editorSetStatusMessage("%d bytes written to disk", len);
-    } else {
+    }
+    else
+    {
         editorSetStatusMessage("Can't save! I/O error");
     }
 }
