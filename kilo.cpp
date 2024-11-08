@@ -63,7 +63,7 @@ enum editorKey
 /*** prototypes ***/
 void editorSetStatusMessage(const char *fmt, ...);
 void editorRefreshScreen();
-std::string editorPrompt(const std::string &prompt);
+std::string editorPrompt(const std::string &prompt, void (*callback)(const std::string &, int) = nullptr);
 
 /** Terminal */
 void die(const char *s)
@@ -250,6 +250,21 @@ int editorRowCxToRx(erow *row, int cx)
         rx++;
     }
     return rx;
+}
+
+int editorRowRxToCx(erow *row, int rx)
+{
+    int cur_rx = 0;
+    int cx;
+    for (cx = 0; cx < row->size; cx++)
+    {
+        if (row->chars[cx] == '\t')
+            cur_rx += (KILO_TAB_STOP - 1) - (cur_rx % KILO_TAB_STOP);
+        cur_rx++;
+        if (cur_rx > rx)
+            return cx;
+    }
+    return cx;
 }
 
 void editorUpdateRow(erow *row)
@@ -462,6 +477,75 @@ void editorSave()
     }
 }
 
+/*** find ***/
+void editorFindCallback(const std::string &query, int key)
+{
+    static int last_match = -1;
+    static int direction = 1;
+
+    if (key == '\r' || key == '\x1b')
+    {
+        last_match = -1;
+        direction = 1;
+        return;
+    }
+    else if (key == ARROW_RIGHT || key == ARROW_DOWN)
+    {
+        direction = 1;
+    }
+    else if (key == ARROW_LEFT || key == ARROW_UP)
+    {
+        direction = -1;
+    }
+    else
+    {
+        last_match = -1;
+        direction = 1;
+    }
+
+    if (last_match == -1)
+        direction = 1;
+    int current = last_match;
+    for (int i = 0; i < E.numrows; i++)
+    {
+        current += direction;
+        if (current == -1)
+            current = E.numrows - 1;
+        else if (current == E.numrows)
+            current = 0;
+
+        erow *row = &E.row[current];
+        const char *match = strstr(row->render, query.c_str());
+        if (match)
+        {
+            last_match = current;
+            E.cy = current;
+            E.cx = editorRowRxToCx(row, match - row->render);
+            E.rowoff = E.numrows;
+            break;
+        }
+    }
+}
+
+void editorFind()
+{
+    int saved_cx = E.cx;
+    int saved_cy = E.cy;
+    int saved_coloff = E.coloff;
+    int saved_rowoff = E.rowoff;
+
+    std::string query = editorPrompt("Search: %s (Use ESC/Arrows/Enter)", editorFindCallback);
+    if (query.empty())
+        return;
+    else
+    {
+        E.cx = saved_cx;
+        E.cy = saved_cy;
+        E.coloff = saved_coloff;
+        E.rowoff = saved_rowoff;
+    }
+}
+
 // Open a file and load its contents into the editor
 void editorOpen(const char *filename)
 {
@@ -610,6 +694,10 @@ void editorProcessKeypress()
         editorMoveCursor(c);
         break;
 
+    case CTRL_KEY('f'):
+        editorFind();
+        break;
+
     case CTRL_KEY('l'):
     case '\x1b':
         break;
@@ -621,7 +709,7 @@ void editorProcessKeypress()
     quit_times = KILO_QUIT_TIMES;
 }
 
-std::string editorPrompt(const std::string &prompt)
+std::string editorPrompt(const std::string &prompt, void (*callback)(const std::string &, int) = nullptr)
 {
     size_t buflen = 0;
     std::string buf;
@@ -637,6 +725,8 @@ std::string editorPrompt(const std::string &prompt)
         if (c == '\x1b')
         { // ESC to cancel
             editorSetStatusMessage("");
+            if (callback)
+                callback(buf, c);
             return "";
         }
         else if (c == '\r')
@@ -644,6 +734,8 @@ std::string editorPrompt(const std::string &prompt)
             if (!buf.empty())
             {
                 editorSetStatusMessage("");
+                if (callback)
+                    callback(buf, c);
                 return buf;
             }
         }
@@ -657,6 +749,9 @@ std::string editorPrompt(const std::string &prompt)
             buf += c;
             buflen++;
         }
+
+        if (callback)
+            callback(buf, c);
     }
 }
 
@@ -854,7 +949,7 @@ int main(int argc, char *argv[])
         editorOpen(argv[1]);
     }
 
-    editorSetStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit");
+    editorSetStatusMessage("HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-Q = quit");
     while (1)
     {
         editorRefreshScreen();
