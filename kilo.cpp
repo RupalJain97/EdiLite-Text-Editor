@@ -64,7 +64,8 @@ enum editorKey
 enum editorHighlight
 {
     HL_NORMAL = 0,
-    HL_NUMBER
+    HL_NUMBER,
+    HL_MATCH
 };
 
 /*** prototypes ***/
@@ -251,9 +252,11 @@ int editorSyntaxToColor(int hl)
     switch (hl)
     {
     case HL_NUMBER:
-        return 31; // Red color for numbers
+        return 31; // Red
+    case HL_MATCH:
+        return 34; // Blue
     default:
-        return 37; // White (default) for normal text
+        return 37; // White
     }
 }
 
@@ -526,6 +529,17 @@ void editorFindCallback(const std::string &query, int key)
 {
     static int last_match = -1;
     static int direction = 1;
+    static int saved_hl_line = -1;
+    static unsigned char *saved_hl = nullptr;
+
+    // Restore previous hl if needed
+    if (saved_hl)
+    {
+        memcpy(E.row[saved_hl_line].hl, saved_hl, E.row[saved_hl_line].rsize);
+        free(saved_hl);
+        saved_hl = nullptr;
+        // saved_hl_line = -1;
+    }
 
     if (key == '\r' || key == '\x1b')
     {
@@ -566,6 +580,14 @@ void editorFindCallback(const std::string &query, int key)
             E.cy = current;
             E.cx = editorRowRxToCx(row, match - row->render);
             E.rowoff = E.numrows;
+
+            // Save current hl state for restoration later
+            saved_hl_line = current;
+            saved_hl = (unsigned char *)malloc(row->rsize);
+            memcpy(saved_hl, row->hl, row->rsize);
+
+            // Highlight the search match in blue
+            memset(&row->hl[match - row->render], HL_MATCH, query.length());
             break;
         }
     }
