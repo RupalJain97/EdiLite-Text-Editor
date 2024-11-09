@@ -1063,6 +1063,9 @@ void editorScroll()
 
 void editorDrawRows(std::string &ab)
 {
+    // Calculate line number width based on total lines
+    int lineNumberWidth = std::to_string(E.numrows).length() + 1;
+
     for (int y = 0; y < E.screenrows; y++)
     {
         int filerow = y + E.rowoff;
@@ -1074,7 +1077,7 @@ void editorDrawRows(std::string &ab)
         {
             // Display the line number with padding to keep alignment
             char lineNumber[8];
-            snprintf(lineNumber, sizeof(lineNumber), "%4d ", filerow + 1); // Line number with padding
+            snprintf(lineNumber, sizeof(lineNumber), "%*d ", lineNumberWidth, filerow + 1); // Line number with padding
 
             ab.append("\x1b[93m"); // Set color to bright yellow
             ab.append(lineNumber); // Append line number to the left of each line
@@ -1083,8 +1086,8 @@ void editorDrawRows(std::string &ab)
             int len = E.row[filerow].rsize - E.coloff;
             if (len < 0)
                 len = 0;
-            if (len > E.screencols - 5)
-                len = E.screencols - 5;
+            if (len > E.screencols - lineNumberWidth)
+                len = E.screencols - lineNumberWidth;
 
             char *c = &E.row[filerow].render[E.coloff];
             unsigned char *hl = &E.row[filerow].hl[E.coloff];
