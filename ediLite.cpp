@@ -1233,7 +1233,7 @@ void editorRefreshScreen()
     ab.append("\x1b[H");
 
     char buf[32];
-    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
+    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 2, (E.rx - E.coloff) + 1);
     ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
@@ -1252,7 +1252,6 @@ void editorSetStatusMessage(const char *fmt, ...)
 }
 
 /*** Init ***/
-//  initialize all the fields in the E struct.
 void initEditor()
 {
     E.cx = 0;
@@ -1271,7 +1270,7 @@ void initEditor()
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
         die("getWindowSize");
 
-    E.screenrows -= 3; // Reserve one row for the status bar
+    E.screenrows -= 3; // Reserve 3 rows for the status bar
 }
 
 int main(int argc, char *argv[])
