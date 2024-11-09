@@ -1148,6 +1148,32 @@ void editorDrawRows(std::string &ab)
     }
 }
 
+void editorDrawTopStatusBar(std::string &ab)
+{
+    ab.append("\x1b[7m"); // Invert colors for the status bar
+    const char *editor_name = "EdiLite Text Editor";
+
+    int len = strlen(editor_name);
+    int padding = (E.screencols - len) / 2; // Center-align the text
+    if (padding > 0)
+    {
+        for (int i = 0; i < padding; i++)
+        {
+            ab.append(" ");
+        }
+    }
+    ab.append(editor_name);
+
+    // Fill the remaining space
+    while (len + padding < E.screencols)
+    {
+        ab.append(" ");
+        len++;
+    }
+
+    ab.append("\x1b[m\r\n"); // Reset formatting and move to the next line
+}
+
 void editorDrawStatusBar(std::string &ab)
 {
     ab.append("\x1b[7m"); // Invert colors
@@ -1189,19 +1215,6 @@ void editorDrawMessageBar(std::string &ab)
 void editorRefreshScreen()
 {
     editorScroll();
-    /*
-    write() and STDOUT_FILENO come from <unistd.h>.
-
-    The 4 in our write() call means we are writing 4 bytes out to the terminal. The first byte is \x1b, which is the escape character, or 27 in decimal. (Try and remember \x1b, we will be using it a lot.) The other three bytes are [2J.
-    */
-    // write(STDOUT_FILENO, "\x1b[2J", 4);
-
-    /*
-    reposition the cursor which is at the top-left corner so that we’re ready to draw the editor interface from top to bottom.
-
-    if you have an 80×24 size terminal and you want the cursor in the center of the screen, you could use the command <esc>[12;40H. (Multiple arguments are separated by a ; character.) The default arguments for H both happen to be 1.
-    */
-    // write(STDOUT_FILENO, "\x1b[H", 3);
 
     std::string ab;
 
@@ -1211,11 +1224,11 @@ void editorRefreshScreen()
     // ab.append("\x1b[2J");  // Clear the screen
     ab.append("\x1b[H"); // Move cursor to the top-left corner
 
+    editorDrawTopStatusBar(ab);
     editorDrawRows(ab);
     editorDrawStatusBar(ab);
     editorDrawMessageBar(ab);
 
-    // write(STDOUT_FILENO, "\x1b[H", 3);
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
 
@@ -1258,7 +1271,7 @@ void initEditor()
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
         die("getWindowSize");
 
-    E.screenrows -= 2; // Reserve one row for the status bar
+    E.screenrows -= 3; // Reserve one row for the status bar
 }
 
 int main(int argc, char *argv[])
