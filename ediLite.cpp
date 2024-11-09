@@ -1226,6 +1226,9 @@ void editorRefreshScreen()
 
     editorDrawTopStatusBar(ab);
     editorDrawRows(ab);
+
+    ab.append("\x1b[H");  // Move cursor back to the top
+    ab.append("\x1b[2B"); // Move cursor down by two lines to skip the top bar
     editorDrawStatusBar(ab);
     editorDrawMessageBar(ab);
 
