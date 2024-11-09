@@ -1,4 +1,4 @@
-# Text-Editor
+# EdiLite: Linux Text Editor
 
 EdiLite is a lightweight terminal-based text editor implemented in C++. This editor supports essential editing features, including syntax highlighting, line-based navigation, and file saving.
 
