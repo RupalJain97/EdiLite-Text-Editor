@@ -1,6 +1,6 @@
 # Text-Editor
 
-Kilo is a lightweight terminal-based text editor implemented in C++. This editor supports essential editing features, including syntax highlighting, line-based navigation, and file saving.
+EdiLite is a lightweight terminal-based text editor implemented in C++. This editor supports essential editing features, including syntax highlighting, line-based navigation, and file saving.
 
 ## Key Features
 
@@ -91,7 +91,7 @@ The code is structured into clear sections to handle different functionalities:
 
 ## Installation
 
-To compile and run the Kilo editor:
+To compile and run the EdiLite editor:
 
 1. Clone or download the source code.
 
@@ -101,13 +101,13 @@ To compile and run the Kilo editor:
 
 
 ```
-g++ -o kilo kilo.cpp -Wall
+g++ -o EdiLite EdiLite.cpp -Wall
 ```
 
 4. Run the editor with:
 
 ```
-./kilo <filename>
+./EdiLite <filename>
 ```
 
 If no filename is provided, a new file will be created upon saving.
@@ -124,4 +124,9 @@ If no filename is provided, a new file will be created upon saving.
 
 
 ### Additional Information
-Kilo’s syntax highlighting adapts automatically based on file type, using standard rules for C/C++ elements. Other file types are loaded without syntax-specific coloring.
+EdiLite’s syntax highlighting adapts automatically based on file type, using standard rules for C/C++ elements. Other file types are loaded without syntax-specific coloring.
+
+
+## Code Length
+
+1286 lines of code
