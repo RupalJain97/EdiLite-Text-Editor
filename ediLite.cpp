@@ -1152,7 +1152,7 @@ void editorDrawTopStatusBar(std::string &ab)
 {
     ab.append("\x1b[7m"); // Invert colors for the status bar
     std::string editor_name = std::string("EdiLite Text Editor -- version ") + EDILITE_VERSION;
-    const char *editor_name = editor_name.c_str();
+    // const char *editor_name = editor_name.c_str();
 
     int len = strlen(editor_name);
     int padding = (E.screencols - len) / 2; // Center-align the text
