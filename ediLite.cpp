@@ -1075,7 +1075,10 @@ void editorDrawRows(std::string &ab)
             // Display the line number with padding to keep alignment
             char lineNumber[8];
             snprintf(lineNumber, sizeof(lineNumber), "%4d ", filerow + 1); // Line number with padding
-            ab.append(lineNumber);   // Append line number to the left of each line
+
+            ab.append("\x1b[93m"); // Set color to bright yellow
+            ab.append(lineNumber); // Append line number to the left of each line
+            ab.append("\x1b[39m"); // Reset color to default
 
             int len = E.row[filerow].rsize - E.coloff;
             if (len < 0)
