@@ -19,6 +19,9 @@
 #define KILO_TAB_STOP 8
 #define KILO_QUIT_TIMES 3
 
+#define HL_HIGHLIGHT_NUMBERS (1 << 0)
+#define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
+
 /** Data */
 struct erow
 {
@@ -38,12 +41,13 @@ struct editorConfig
     int screenrows;
     int screencols;
     int numrows;
+    int dirty;
     erow *row;
     char *filename;
-    int dirty;
-    struct termios orig_termios;
     char statusmsg[80];
     time_t statusmsg_time;
+    struct editorSyntax *syntax;
+    struct termios orig_termios;
 };
 struct editorConfig E;
 
@@ -66,6 +70,20 @@ enum editorHighlight
     HL_NORMAL = 0,
     HL_NUMBER,
     HL_MATCH
+};
+
+struct editorSyntax
+{
+    char *filetype;
+    char **filematch;
+    int flags;
+};
+
+char *C_HL_extensions[] = {".c", ".h", ".cpp", NULL};
+struct editorSyntax HLDB[] = {
+    {"c",
+     C_HL_extensions,
+     HL_HIGHLIGHT_NUMBERS},
 };
 
 /*** prototypes ***/
@@ -260,7 +278,8 @@ int editorSyntaxToColor(int hl)
     }
 }
 
-int is_separator(int c) {
+int is_separator(int c)
+{
     return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL;
 }
 
@@ -270,6 +289,9 @@ void editorUpdateSyntax(erow *row)
     row->hl = (unsigned char *)realloc(row->hl, row->rsize);
     memset(row->hl, HL_NORMAL, row->rsize); // Set all to normal initially
 
+    if (E.syntax == NULL)
+        return;
+
     int prev_sep = 1; // Track whether the previous character was a separator
     int i = 0;
 
@@ -278,19 +300,50 @@ void editorUpdateSyntax(erow *row)
         char c = row->render[i];
         unsigned char prev_hl = (i > 0) ? row->hl[i - 1] : HL_NORMAL;
 
-        // Highlight numbers if preceded by a separator or another number character
-        if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) ||
-            (c == '.' && prev_hl == HL_NUMBER))
+        if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS)
         {
-            row->hl[i] = HL_NUMBER;
-            i++;
-            prev_sep = 0;
-            continue;
+            if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) ||
+                (c == '.' && prev_hl == HL_NUMBER))
+            {
+                row->hl[i] = HL_NUMBER;
+                i++;
+                prev_sep = 0;
+                continue;
+            }
         }
 
         // Update `prev_sep` for the next iteration
         prev_sep = is_separator(c);
         i++;
+    }
+}
+
+void editorSelectSyntaxHighlight()
+{
+    E.syntax = NULL;
+    if (E.filename == NULL)
+        return;
+    char *ext = strrchr(E.filename, '.');
+    for (unsigned int j = 0; j < HLDB_ENTRIES; j++)
+    {
+        struct editorSyntax *s = &HLDB[j];
+        unsigned int i = 0;
+        while (s->filematch[i])
+        {
+            int is_ext = (s->filematch[i][0] == '.');
+            if ((is_ext && ext && !strcmp(ext, s->filematch[i])) ||
+                (!is_ext && strstr(E.filename, s->filematch[i])))
+            {
+                E.syntax = s;
+                int filerow;
+                for (filerow = 0; filerow < E.numrows; filerow++)
+                {
+                    editorUpdateSyntax(&E.row[filerow]);
+                }
+                return;
+            }
+            i++;
+        }
     }
 }
 
@@ -525,6 +578,7 @@ void editorSave()
             editorSetStatusMessage("Save aborted");
             return;
         }
+        editorSelectSyntaxHighlight();
     }
 
     int len;
@@ -634,7 +688,11 @@ void editorFind()
 // Open a file and load its contents into the editor
 void editorOpen(const char *filename)
 {
+    // free(E.filename);
     E.filename = strdup(filename);
+
+    editorSelectSyntaxHighlight();
+
     FILE *fp = fopen(filename, "r");
     if (!fp)
         die("fopen");
@@ -940,8 +998,7 @@ void editorDrawStatusBar(std::string &ab)
     int len = snprintf(status, sizeof(status), "%.20s - %d lines",
                        E.filename ? E.filename : "[No Name]", E.numrows, E.dirty ? "(modified)" : "");
 
-    int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d",
-                        E.cy + 1, E.numrows);
+    int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d", E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
     if (len > E.screencols)
         len = E.screencols;
     ab.append(status);
@@ -1035,14 +1092,16 @@ void initEditor()
     E.coloff = 0;
     E.numrows = 0;
     E.row = nullptr;
-    if (getWindowSize(&E.screenrows, &E.screencols) == -1)
-        die("getWindowSize");
-
-    E.screenrows -= 2; // Reserve one row for the status bar
     E.filename = nullptr;
     E.statusmsg[0] = '\0';
     E.statusmsg_time = 0;
     E.dirty = 0;
+    E.syntax = nullptr;
+
+    if (getWindowSize(&E.screenrows, &E.screencols) == -1)
+        die("getWindowSize");
+
+    E.screenrows -= 2; // Reserve one row for the status bar
 }
 
 int main(int argc, char *argv[])
