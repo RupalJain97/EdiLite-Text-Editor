@@ -1068,37 +1068,20 @@ void editorDrawRows(std::string &ab)
         int filerow = y + E.rowoff;
         if (filerow >= E.numrows)
         {
-            // if (E.numrows == 0 && y == E.screenrows / 3)
-            // {
-            //     // Display the welcome message a third of the way down
-            //     char welcome[80];
-            //     int welcomelen = snprintf(welcome, sizeof(welcome), "EdiLite Text editor -- version %s", EDILITE_VERSION);
-            //     if (welcomelen > E.screencols)
-            //         welcomelen = E.screencols;
-
-            //     int padding = (E.screencols - welcomelen) / 2;
-            //     if (padding)
-            //     {
-            //         ab.append("~");
-            //         padding--;
-            //     }
-            //     while (padding--)
-            //         ab.append(" ");
-            //     ab.append(welcome, welcomelen);
-            // }
-            // else
-            // {
             ab.append("~");
-            // }
         }
         else
         {
+            // Display the line number with padding to keep alignment
+            char lineNumber[8];
+            snprintf(lineNumber, sizeof(lineNumber), "%4d ", filerow + 1); // Line number with padding
+            ab.append(lineNumber);   // Append line number to the left of each line
+
             int len = E.row[filerow].rsize - E.coloff;
             if (len < 0)
                 len = 0;
-            if (len > E.screencols)
-                len = E.screencols;
-            // ab.append(&E.row[filerow].render[E.coloff], len);
+            if (len > E.screencols - 5)
+                len = E.screencols - 5;
 
             char *c = &E.row[filerow].render[E.coloff];
             unsigned char *hl = &E.row[filerow].hl[E.coloff];
