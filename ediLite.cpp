@@ -1220,7 +1220,7 @@ void editorDrawHelpLine(std::string &ab)
     int helpTextLen = helpText.length();
     if (helpTextLen > E.screencols)
         helpTextLen = E.screencols;
-    ab.append(helpText, helpTextLen); // Add the help text
+    ab.append(helpText); // Add the help text
     while (helpTextLen < E.screencols)
     {
         ab.append(" "); // Fill the rest with spaces
@@ -1252,7 +1252,7 @@ void editorRefreshScreen()
     ab.append("\x1b[H");
 
     char buf[32];
-    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 3, (E.rx - E.coloff) + 1);
+    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 2, (E.rx - E.coloff) + 1);
     ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
