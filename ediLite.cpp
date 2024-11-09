@@ -1245,8 +1245,8 @@ void editorRefreshScreen()
     editorDrawTopStatusBar(ab);
     editorDrawRows(ab);
     editorDrawStatusBar(ab);
-    editorDrawMessageBar(ab);
     editorDrawHelpLine(ab);
+    editorDrawMessageBar(ab);
 
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
