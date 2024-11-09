@@ -1211,8 +1211,6 @@ void editorDrawMessageBar(std::string &ab)
     if (msglen && time(nullptr) - E.statusmsg_time < 5)
         ab.append(E.statusmsg, msglen);
 
-    ab.append("\x1b[m"); // Reset to normal formatting
-    ab.append("\r\n");
 }
 
 void editorRefreshScreen()
