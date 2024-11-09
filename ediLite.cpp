@@ -1068,28 +1068,28 @@ void editorDrawRows(std::string &ab)
         int filerow = y + E.rowoff;
         if (filerow >= E.numrows)
         {
-            if (E.numrows == 0 && y == E.screenrows / 3)
-            {
-                // Display the welcome message a third of the way down
-                char welcome[80];
-                int welcomelen = snprintf(welcome, sizeof(welcome), "EdiLite Text editor -- version %s", EDILITE_VERSION);
-                if (welcomelen > E.screencols)
-                    welcomelen = E.screencols;
+            // if (E.numrows == 0 && y == E.screenrows / 3)
+            // {
+            //     // Display the welcome message a third of the way down
+            //     char welcome[80];
+            //     int welcomelen = snprintf(welcome, sizeof(welcome), "EdiLite Text editor -- version %s", EDILITE_VERSION);
+            //     if (welcomelen > E.screencols)
+            //         welcomelen = E.screencols;
 
-                int padding = (E.screencols - welcomelen) / 2;
-                if (padding)
-                {
-                    ab.append("~");
-                    padding--;
-                }
-                while (padding--)
-                    ab.append(" ");
-                ab.append(welcome, welcomelen);
-            }
-            else
-            {
+            //     int padding = (E.screencols - welcomelen) / 2;
+            //     if (padding)
+            //     {
+            //         ab.append("~");
+            //         padding--;
+            //     }
+            //     while (padding--)
+            //         ab.append(" ");
+            //     ab.append(welcome, welcomelen);
+            // }
+            // else
+            // {
                 ab.append("~");
-            }
+            // }
         }
         else
         {
@@ -1151,7 +1151,7 @@ void editorDrawRows(std::string &ab)
 void editorDrawTopStatusBar(std::string &ab)
 {
     ab.append("\x1b[7m"); // Invert colors for the status bar
-    const char *editor_name = "EdiLite Text Editor";
+    const char *editor_name = "EdiLite Text Editor -- version " + EDILITE_VERSION;
 
     int len = strlen(editor_name);
     int padding = (E.screencols - len) / 2; // Center-align the text
@@ -1210,7 +1210,23 @@ void editorDrawMessageBar(std::string &ab)
         msglen = E.screencols;
     if (msglen && time(nullptr) - E.statusmsg_time < 5)
         ab.append(E.statusmsg, msglen);
+}
 
+void editorDrawHelpLine(std::string &ab)
+{
+    ab.append("\x1b[7m"); // Invert colors for emphasis
+    std::string helpText = "HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-Q = quit";
+    int helpTextLen = helpText.length();
+    if (helpTextLen > E.screencols)
+        helpTextLen = E.screencols;
+    ab.append(helpText, helpTextLen); // Add the help text
+    while (helpTextLen < E.screencols)
+    {
+        ab.append(" "); // Fill the rest with spaces
+        helpTextLen++;
+    }
+    ab.append("\x1b[m"); // Reset colors
+    ab.append("\r\n");
 }
 
 void editorRefreshScreen()
@@ -1229,6 +1245,7 @@ void editorRefreshScreen()
     editorDrawRows(ab);
     editorDrawStatusBar(ab);
     editorDrawMessageBar(ab);
+    editorDrawHelpLine(ab);
 
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
@@ -1271,7 +1288,7 @@ void initEditor()
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
         die("getWindowSize");
 
-    E.screenrows -= 3; // Reserve 3 rows for the status bar
+    E.screenrows -= 4; // Reserve 3 rows for the status bar
 }
 
 int main(int argc, char *argv[])
@@ -1286,7 +1303,7 @@ int main(int argc, char *argv[])
         editorOpen(argv[1]);
     }
 
-    editorSetStatusMessage("HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-Q = quit");
+    editorSetStatusMessage("Welcome to EdiLite, Use Arrow keys to navigate.");
     while (1)
     {
         editorRefreshScreen();
