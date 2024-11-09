@@ -15,9 +15,9 @@
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
-#define KILO_VERSION "0.0.1"
-#define KILO_TAB_STOP 8
-#define KILO_QUIT_TIMES 3
+#define EDILITE_VERSION "0.0.1"
+#define EDILITE_TAB_STOP 8
+#define EDILITE_QUIT_TIMES 3
 
 #define HL_HIGHLIGHT_NUMBERS (1 << 0)
 #define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
@@ -489,7 +489,7 @@ int editorRowCxToRx(erow *row, int cx)
     for (j = 0; j < cx; j++)
     {
         if (row->chars[j] == '\t')
-            rx += (KILO_TAB_STOP - 1) - (rx % KILO_TAB_STOP);
+            rx += (EDILITE_TAB_STOP - 1) - (rx % EDILITE_TAB_STOP);
         rx++;
     }
     return rx;
@@ -502,7 +502,7 @@ int editorRowRxToCx(erow *row, int rx)
     for (cx = 0; cx < row->size; cx++)
     {
         if (row->chars[cx] == '\t')
-            cur_rx += (KILO_TAB_STOP - 1) - (cur_rx % KILO_TAB_STOP);
+            cur_rx += (EDILITE_TAB_STOP - 1) - (cur_rx % EDILITE_TAB_STOP);
         cur_rx++;
         if (cur_rx > rx)
             return cx;
@@ -522,7 +522,7 @@ void editorUpdateRow(erow *row)
             tabs++;
     }
 
-    row->render = (char *)malloc(row->size + tabs * (KILO_TAB_STOP - 1) + 1);
+    row->render = (char *)malloc(row->size + tabs * (EDILITE_TAB_STOP - 1) + 1);
     int idx = 0;
 
     for (int j = 0; j < row->size; j++)
@@ -530,7 +530,7 @@ void editorUpdateRow(erow *row)
         if (row->chars[j] == '\t')
         {
             row->render[idx++] = ' ';
-            while (idx % (KILO_TAB_STOP) != 0)
+            while (idx % (EDILITE_TAB_STOP) != 0)
                 row->render[idx++] = ' ';
         }
         else
@@ -911,7 +911,7 @@ void editorMoveCursor(int key)
 
 void editorProcessKeypress()
 {
-    static int quit_times = KILO_QUIT_TIMES;
+    static int quit_times = EDILITE_QUIT_TIMES;
     int c = editorReadKey();
 
     switch (c)
@@ -993,7 +993,7 @@ void editorProcessKeypress()
         editorInsertChar(c);
         break;
     }
-    quit_times = KILO_QUIT_TIMES;
+    quit_times = EDILITE_QUIT_TIMES;
 }
 
 std::string editorPrompt(const std::string &prompt, void (*callback)(const std::string &, int) = nullptr)
@@ -1072,7 +1072,7 @@ void editorDrawRows(std::string &ab)
             {
                 // Display the welcome message a third of the way down
                 char welcome[80];
-                int welcomelen = snprintf(welcome, sizeof(welcome), "Kilo editor -- version %s", KILO_VERSION);
+                int welcomelen = snprintf(welcome, sizeof(welcome), "EdiLite Text editor -- version %s", EDILITE_VERSION);
                 if (welcomelen > E.screencols)
                     welcomelen = E.screencols;
 
@@ -1264,9 +1264,6 @@ void initEditor()
 int main(int argc, char *argv[])
 {
     std::cout << "Welcome to the text Editor\n";
-    // std::cout << "This is the raw mode.\n";
-    // std::cout << "Raw mode is a terminal setting that allows the program to read input directly from the user without buffering or processing (like echoing characters or interpreting special keys). This lets the editor respond immediately to each keypress for an interactive editing experience.\n";
-    // std::cout << "Enter 'q' to exit.\n";
 
     enableRawMode();
     initEditor();
