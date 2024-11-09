@@ -1,17 +1,17 @@
 /** Libraries */
-#include <iostream>  // For input/output in C++
-#include <unistd.h>  // For read() and STDIN_FILENO
-#include <stdlib.h>  // For atexit()
-#include <termios.h> // Terminal I/O attributes
-#include <errno.h>
+#include <iostream>    // For input/output in C++
+#include <unistd.h>    // For read() and STDIN_FILENO
+#include <stdlib.h>    // For atexit() and memory management
+#include <termios.h>   // For terminal I/O attributes
+#include <errno.h>     // For error handling
 #include <cstring>     // For strerror
 #include <sys/ioctl.h> // To get terminal dimensions
-#include <stdio.h>
-#include <string>
-#include <vector>
-#include <time.h>
-#include <cstdarg> // For va_list, va_start, va_end
-#include <fstream>
+#include <stdio.h>     // For standard I/O functions
+#include <string>      // For string handling
+#include <vector>      // For vector data structure
+#include <time.h>      // For time handling
+#include <cstdarg>     // For variadic arguments
+#include <fstream>     // For file handling
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
@@ -26,31 +26,31 @@
 /** Data */
 struct erow
 {
-    int idx;
-    int size;
-    int rsize;
-    char *chars;
-    char *render;
-    unsigned char *hl;
-    int hl_open_comment;
+    int idx;             // Row index in the file
+    int size;            // Size of the row
+    int rsize;           // Rendered size (tabs expanded)
+    char *chars;         // Actual characters in the row
+    char *render;        // Rendered row with tabs converted to spaces
+    unsigned char *hl;   // Highlight attributes for each character
+    int hl_open_comment; // Indicates if the row has an open comment
 };
 
 struct editorConfig
 {
-    int cx, cy;
-    int rx;
-    int rowoff;
-    int coloff;
-    int screenrows;
-    int screencols;
-    int numrows;
-    int dirty;
-    erow *row;
-    char *filename;
-    char statusmsg[80];
-    time_t statusmsg_time;
-    struct editorSyntax *syntax;
-    struct termios orig_termios;
+    int cx, cy;                  // Cursor position in chars
+    int rx;                      // Rendered x position
+    int rowoff;                  // Offset for row scrolling
+    int coloff;                  // Offset for column scrolling
+    int screenrows;              // Number of rows on the screen
+    int screencols;              // Number of columns on the screen
+    int numrows;                 // Number of rows in the file
+    int dirty;                   // Indicates if file has unsaved changes
+    erow *row;                   // Rows of text in the editor
+    char *filename;              // Opened filename
+    char statusmsg[80];          // Status message displayed to the user
+    time_t statusmsg_time;       // Timestamp of the last status message
+    struct editorSyntax *syntax; // Syntax highlighting for the file type
+    struct termios orig_termios; // Original terminal attributes
 };
 struct editorConfig E;
 
@@ -82,13 +82,13 @@ enum editorHighlight
 
 struct editorSyntax
 {
-    char *filetype;
-    char **filematch;
-    char **keywords;
-    char *singleline_comment_start;
-    char *multiline_comment_start;
-    char *multiline_comment_end;
-    int flags;
+    char *filetype;                 // Name of the file type
+    char **filematch;               // Array of filename extensions
+    char **keywords;                // Array of keywords for syntax highlighting
+    char *singleline_comment_start; // Single-line comment start pattern
+    char *multiline_comment_start;  // Multi-line comment start pattern
+    char *multiline_comment_end;    // Multi-line comment end pattern
+    int flags;                      // Flags for syntax highlighting
 };
 
 char *C_HL_extensions[] = {".c", ".h", ".cpp", NULL};
@@ -445,7 +445,7 @@ void editorUpdateSyntax(erow *row)
         prev_sep = is_separator(c);
         i++;
     }
-    
+
     int changed = (row->hl_open_comment != in_comment);
     row->hl_open_comment = in_comment;
     if (changed && row->idx + 1 < E.numrows)
