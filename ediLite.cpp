@@ -1210,6 +1210,9 @@ void editorDrawMessageBar(std::string &ab)
         msglen = E.screencols;
     if (msglen && time(nullptr) - E.statusmsg_time < 5)
         ab.append(E.statusmsg, msglen);
+
+    ab.append("\x1b[m"); // Reset to normal formatting
+    ab.append("\r\n");
 }
 
 void editorRefreshScreen()
@@ -1226,9 +1229,6 @@ void editorRefreshScreen()
 
     editorDrawTopStatusBar(ab);
     editorDrawRows(ab);
-
-    ab.append("\x1b[H");  // Move cursor back to the top
-    ab.append("\x1b[2B"); // Move cursor down by two lines to skip the top bar
     editorDrawStatusBar(ab);
     editorDrawMessageBar(ab);
 
