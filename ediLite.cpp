@@ -1237,11 +1237,14 @@ void editorRefreshScreen()
     editorDrawHelpLine(ab);
     editorDrawMessageBar(ab);
 
+    // Calculate line number width dynamically
+    int lineNumberWidth = std::to_string(E.numrows).length() + 1;
+
     // Move the cursor back to the top-left corner
     ab.append("\x1b[H");
 
     char buf[32];
-    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 2, (E.rx - E.coloff) + 1);
+    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + lineNumberWidth + 2, (E.rx - E.coloff) + 1);
     ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
