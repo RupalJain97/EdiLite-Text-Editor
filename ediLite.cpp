@@ -1077,7 +1077,7 @@ void editorDrawRows(std::string &ab)
         {
             // Display the line number with padding to keep alignment
             char lineNumber[8];
-            snprintf(lineNumber, sizeof(lineNumber), "%*d ", lineNumberWidth, filerow ); // Line number with padding
+            snprintf(lineNumber, sizeof(lineNumber), "%*d ", lineNumberWidth, filerow); // Line number with padding
 
             ab.append("\x1b[93m"); // Set color to bright yellow
             ab.append(lineNumber); // Append line number to the left of each line
@@ -1244,7 +1244,7 @@ void editorRefreshScreen()
     // ab.append("\x1b[H");
 
     char buf[32];
-    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + lineNumberWidth + 2);
+    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 2, (E.rx - E.coloff) + lineNumberWidth + 2);
     ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
