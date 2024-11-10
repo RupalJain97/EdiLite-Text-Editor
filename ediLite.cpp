@@ -313,9 +313,7 @@ int editorSyntaxToColor(int hl)
     case HL_DEFINE:
         return 92; // Bright Red
     case HL_CAPS:
-        return 38;
-        5;
-        141; // Bright Cyan
+        return 35; // Bright Cyan
     default:
         return 37; // White
     }
@@ -1183,9 +1181,16 @@ void editorDrawRows(std::string &ab)
                     int color = editorSyntaxToColor(hl[j]);
                     if (color != current_color)
                     {
-                        char buf[16];
-                        int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
-                        ab.append(buf, clen); // Apply new color
+                        if (hl[j] == HL_CAPS)
+                        {
+                            ab.append("\033[38;5;168m"); // Set to orange for CAPS
+                        }
+                        else
+                        {
+                            char buf[16];
+                            int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
+                            ab.append(buf, clen); // Apply new color
+                        }
                         current_color = color;
                     }
                     ab.append(1, c[j]);
