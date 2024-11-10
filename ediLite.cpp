@@ -313,7 +313,7 @@ int editorSyntaxToColor(int hl)
     case HL_DEFINE:
         return 92; // Bright Red
     case HL_CAPS:
-        return 96; // Bright Cyan
+        return 93; // Bright Cyan
     default:
         return 37; // White
     }
@@ -423,10 +423,10 @@ void editorUpdateSyntax(erow *row)
             }
         }
 
-        if (E.syntax->flags && prev_sep && isupper(c))
+        if (E.syntax->flags && (prev_sep && (isupper(c) || c == '_' || c == '-')))
         {
             int start = i;
-            while (i < row->rsize && isupper(row->render[i]) && row->render[i] != ' ' && row->render[i] != ',')
+            while (i < row->rsize && (isupper(row->render[i]) || row->render[i] != ' ' || row->render[i] != ',' || row->render[i] != ';' || row->render[i] == '_'))
             {
                 i++;
             }
@@ -434,6 +434,7 @@ void editorUpdateSyntax(erow *row)
             {
                 memset(&row->hl[start], HL_CAPS, i - start); // Apply `HL_CAPS` color
             }
+            i--;
         }
 
         if (E.syntax->flags & HL_HIGHLIGHT_STRINGS)
