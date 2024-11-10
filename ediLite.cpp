@@ -81,8 +81,8 @@ enum editorHighlight
     HL_MATCH,   // For search matches
     HL_INCLUDE, // New: for #include
     HL_HEADER,  // New: for header file names
-    HL_DEFINE   // New: for all #define
-        HL_CAPS // New: for keywords in all caps
+    HL_DEFINE,   // New: for all #define
+    HL_CAPS // New: for keywords in all caps
 };
 
 struct editorSyntax
