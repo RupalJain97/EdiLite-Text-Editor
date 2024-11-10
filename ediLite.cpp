@@ -1184,15 +1184,8 @@ void editorDrawRows(std::string &ab)
                     if (color != current_color)
                     {
                         char buf[16];
-                        if (hl[j] == HL_CAPS)
-                        {
-                            ab.append("\033[38;5;202m"); // Set to orange for CAPS
-                        }
-                        else
-                        {
-                            int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
-                            ab.append(buf, clen); // Apply new color
-                        }
+                        int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
+                        ab.append(buf, clen); // Apply new color
                         current_color = color;
                     }
                     ab.append(1, c[j]);
