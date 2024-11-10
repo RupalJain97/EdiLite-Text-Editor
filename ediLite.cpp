@@ -301,17 +301,17 @@ int editorSyntaxToColor(int hl)
     case HL_KEYWORD2:
         return 32; // Green
     case HL_STRING:
-        return 35; // Magenta
+        return 95; // Magenta
     case HL_NUMBER:
         return 31; // Red
     case HL_MATCH:
-        return 34; // Blue
+        return 94; // Blue
     case HL_INCLUDE:
         return 92; // Bright Green
     case HL_HEADER:
-        return 94; // Bright Blue
+        return 96; // Bright Blue
     case HL_DEFINE:
-        return 91; // Bright Red
+        return 92; // Bright Red
     case HL_CAPS:
         return 96; // Bright Cyan
     default:
