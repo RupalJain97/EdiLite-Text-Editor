@@ -406,7 +406,7 @@ void editorUpdateSyntax(erow *row)
         }
 
         // Highlight header files names, like <stdio.h>
-        if (row->render[i] == '<')
+        if (&& !in_string && !in_comment && row->render[i] == '<')
         {
             int j = i + 1;
             while (j < row->rsize && row->render[j] != '>')
