@@ -1192,8 +1192,8 @@ void editorDrawRows(std::string &ab)
                         {
                             int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
                             ab.append(buf, clen); // Apply new color
-                            current_color = color;
-                        }
+                                                }
+                        current_color = color;
                     }
                     ab.append(1, c[j]);
                 }
