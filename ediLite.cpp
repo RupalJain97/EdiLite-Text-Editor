@@ -420,7 +420,7 @@ void editorUpdateSyntax(erow *row)
             }
         }
 
-        if (E.syntax->flags && (prev_sep && isupper(c)))
+        if (E.syntax->flags && !in_string && !in_comment && (prev_sep && isupper(c)))
         {
             int start = i;
             while (i < row->rsize && (isupper(row->render[i]) || row->render[i] == '_'  || isdigit(row->render[i])))
