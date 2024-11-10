@@ -289,7 +289,7 @@ int getWindowSize(int *rows, int *cols)
 }
 
 /*** syntax highlighting ***/
-const char* editorSyntaxToColor(int hl)
+const char *editorSyntaxToColor(int hl)
 {
     switch (hl)
     {
@@ -1151,7 +1151,7 @@ void editorDrawRows(std::string &ab)
             char *c = &E.row[filerow].render[E.coloff];
             unsigned char *hl = &E.row[filerow].hl[E.coloff];
 
-            int current_color = -1;
+            const char *current_color = nullptr;
             for (int j = 0; j < len; j++)
             {
                 if (iscntrl(c[j]))
@@ -1160,19 +1160,17 @@ void editorDrawRows(std::string &ab)
                     ab.append("\x1b[7m");
                     ab.append(sym, 1);
                     ab.append("\x1b[m");
-                    if (current_color != -1)
+                    if (current_color)
                     {
-                        char buf[16];
-                        int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", current_color);
-                        ab.append(buf, clen);
+                        ab.append(current_color); // Reapply the color after control character
                     }
                 }
                 else if (hl[j] == HL_NORMAL)
                 {
-                    if (current_color != -1)
+                    if (current_color)
                     {
                         ab.append("\x1b[39m"); // Reset color
-                        current_color = -1;
+                        current_color = nullptr;
                     }
                     ab.append(1, c[j]);
                 }
