@@ -305,7 +305,7 @@ const char *editorSyntaxToColor(int hl)
     case HL_NUMBER:
         return "\033[38;5;31m"; // Cyan
     case HL_MATCH:
-        return "\033[97;190m"; // Bright Yello
+        return "\033[93m"; // Bright Yellow
     case HL_INCLUDE:
         return "\033[38;5;92m"; // Purple
     case HL_HEADER:
