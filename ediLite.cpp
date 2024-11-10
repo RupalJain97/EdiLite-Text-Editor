@@ -326,7 +326,7 @@ int is_separator(int c)
 
 int is_separator_caps(int c)
 {
-    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];}:1234567890", c) != NULL;
+    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];}:?", c) != NULL;
 }
 
 void editorUpdateSyntax(erow *row)
@@ -423,7 +423,7 @@ void editorUpdateSyntax(erow *row)
         if (E.syntax->flags && (prev_sep && isupper(c)))
         {
             int start = i;
-            while (i < row->rsize && (isupper(row->render[i]) || row->render[i] == '_'))
+            while (i < row->rsize && (isupper(row->render[i]) || row->render[i] == '_'  || isdigit(row->render[i])))
             {
                 i++;
             }
