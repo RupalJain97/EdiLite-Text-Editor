@@ -326,7 +326,7 @@ int is_separator(int c)
 
 int is_separator_caps(int c)
 {
-    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];}:", c) != NULL;
+    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];}:1234567890", c) != NULL;
 }
 
 void editorUpdateSyntax(erow *row)
