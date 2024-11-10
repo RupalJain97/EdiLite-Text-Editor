@@ -18,19 +18,10 @@ int main()
 	std::cout << "\nExtended 256 Colors (38;5;0-255):\n";
 	for (int i = 0; i < 256; i++)
 	{
-		std::cout << "  \033[38;5;" << i << "m" << i << ": sample text\033[0m\t  ";
+		std::cout << "  \033[38;5;" << i << "m" << i << ": sample \033[0m  ";
+		std::cout << "\033[48;5;" << i << "m" << i << ": sample\033[0m   \t";
 		if ((i + 1) % 8 == 0)
 		{ // To format into columns
-			std::cout << "\n";
-		}
-	}
-
-	for (int i = 0; i < 256; i++)
-	{
-		std::cout << "  \033[38;5;" << i << "m" << i << ": fg\033[0m   ";
-		std::cout << "\033[48;5;" << i << "m" << i << ": bg\033[0m   ";
-		if ((i + 1) % 4 == 0) // Format into columns
-		{
 			std::cout << "\n";
 		}
 	}
