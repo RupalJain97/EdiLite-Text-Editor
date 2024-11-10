@@ -1070,7 +1070,7 @@ void editorDrawRows(std::string &ab)
 
     for (int y = 0; y < E.screenrows; y++)
     {
-        int filerow = y + E.rowoff;
+        int filerow = y + E.rowoff + 1;
         if (filerow >= E.numrows)
         {
             ab.append("~");
