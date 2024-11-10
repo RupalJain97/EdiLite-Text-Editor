@@ -819,6 +819,8 @@ void editorFindCallback(const std::string &query, int key)
     {
         last_match = -1;
         direction = 1;
+        free(saved_hl);
+        saved_hl = nullptr;
         return;
     }
     else if (key == ARROW_RIGHT || key == ARROW_DOWN)
