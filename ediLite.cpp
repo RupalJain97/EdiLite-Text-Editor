@@ -299,7 +299,7 @@ const char *editorSyntaxToColor(int hl)
     case HL_KEYWORD1:
         return "\033[38;5;33m"; // Blue
     case HL_KEYWORD2:
-        return "\033[38;5;32m"; // Purple
+        return "\033[94m"; // Blue
     case HL_STRING:
         return "\033[38;5;95m"; // Brown
     case HL_NUMBER:
