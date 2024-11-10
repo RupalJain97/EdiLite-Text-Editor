@@ -295,27 +295,27 @@ int editorSyntaxToColor(int hl)
     {
     case HL_COMMENT:
     case HL_MLCOMMENT:
-        return 36; // Light Blue
+        return "\033[38;5;36m"; // Light Blue (ANSI 36)
     case HL_KEYWORD1:
-        return 33; // Yellow
+        return "\033[38;5;33m"; // Yellow (ANSI 33)
     case HL_KEYWORD2:
-        return 32; // Green
+        return "\033[38;5;32m"; // Green (ANSI 32)
     case HL_STRING:
-        return 95; // Magenta
+        return "\033[38;5;95m"; // Magenta (ANSI 95)
     case HL_NUMBER:
-        return 31; // Red
+        return "\033[38;5;31m"; // Red (ANSI 31)
     case HL_MATCH:
-        return 94; // Blue
+        return "\033[38;5;94m"; // Blue (ANSI 94)
     case HL_INCLUDE:
-        return 92; // Bright Green
+        return "\033[38;5;92m"; // Bright Green (ANSI 92)
     case HL_HEADER:
-        return 96; // Bright Blue
+        return "\033[38;5;96m"; // Bright Blue (ANSI 96)
     case HL_DEFINE:
-        return 92; // Bright Red
+        return "\033[38;5;92m"; // Bright Red (ANSI 92)
     case HL_CAPS:
-        return 35; // Bright Cyan
+        return "\033[38;5;168m"; // Bright Cyan
     default:
-        return 37; // White
+        return "\033[38;5;37m"; // White (ANSi 37)
     }
 }
 
@@ -1178,20 +1178,13 @@ void editorDrawRows(std::string &ab)
                 }
                 else
                 {
-                    int color = editorSyntaxToColor(hl[j]);
-                    if (color != current_color)
+                    const char *color_code = editorSyntaxToColor(hl[j]);
+                    if (color_code != current_color)
                     {
-                        if (hl[j] == HL_CAPS)
-                        {
-                            ab.append("\033[38;5;168m"); // Set to orange for CAPS
-                        }
-                        else
-                        {
-                            char buf[16];
-                            int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
-                            ab.append(buf, clen); // Apply new color
-                        }
-                        current_color = color;
+                        ab.append(color_code); // Apply the custom color for the highlight
+                        ab.append(buf, clen);  // Apply new color
+
+                        current_color = color_code;
                     }
                     ab.append(1, c[j]);
                 }
