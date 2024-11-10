@@ -20,7 +20,7 @@ int main()
 	{
 		std::cout << "  \033[38;5;" << i << "m" << i << ": sample \033[0m  ";
 		std::cout << "\033[48;5;" << i << "m" << i << ": sample\033[0m   \t";
-		if ((i + 1) % 8 == 0)
+		if ((i + 1) % 4 == 0)
 		{ // To format into columns
 			std::cout << "\n";
 		}
