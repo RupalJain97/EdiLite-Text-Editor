@@ -426,7 +426,7 @@ void editorUpdateSyntax(erow *row)
         if (E.syntax->flags && (prev_sep && (isupper(c) || c == '_' || c == '-')))
         {
             int start = i;
-            while (i < row->rsize && (isupper(row->render[i]) || row->render[i] != ' ' || row->render[i] != ',' || row->render[i] != ';' || row->render[i] == '_'))
+            while (i < row->rsize && (isupper(row->render[i]) && ( row->render[i] != ' ' || row->render[i] != ',' || row->render[i] != ';' || row->render[i] == '_')))
             {
                 i++;
             }
