@@ -1089,7 +1089,7 @@ void editorDrawRows(std::string &ab)
             int len = E.row[filerow].rsize - E.coloff;
             if (len < 0)
                 len = 0;
-            if (len > E.screencols - lineNumberWidth)
+            if (len > E.screencols - lineNumberWidth - 1)
                 len = E.screencols - lineNumberWidth - 1;
 
             char *c = &E.row[filerow].render[E.coloff];
