@@ -81,8 +81,8 @@ enum editorHighlight
     HL_MATCH,   // For search matches
     HL_INCLUDE, // New: for #include
     HL_HEADER,  // New: for header file names
-    HL_DEFINE,   // New: for all #define
-    HL_CAPS // New: for keywords in all caps
+    HL_DEFINE,  // New: for all #define
+    HL_CAPS     // New: for keywords in all caps
 };
 
 struct editorSyntax
@@ -311,9 +311,11 @@ int editorSyntaxToColor(int hl)
     case HL_HEADER:
         return 96; // Bright Blue
     case HL_DEFINE:
-        return 92;// Bright Red
+        return 92; // Bright Red
     case HL_CAPS:
-        return 38;5;141; // Bright Cyan
+        return 38;
+        5;
+        141; // Bright Cyan
     default:
         return 37; // White
     }
@@ -423,7 +425,7 @@ void editorUpdateSyntax(erow *row)
         if (E.syntax->flags && !in_string && !in_comment && (prev_sep && isupper(c)))
         {
             int start = i;
-            while (i < row->rsize && (isupper(row->render[i]) || row->render[i] == '_'  || isdigit(row->render[i])))
+            while (i < row->rsize && (isupper(row->render[i]) || row->render[i] == '_' || isdigit(row->render[i])))
             {
                 i++;
             }
@@ -1179,7 +1181,11 @@ void editorDrawRows(std::string &ab)
                 else
                 {
                     int color = editorSyntaxToColor(hl[j]);
-                    if (color != current_color)
+                    if (hl[j] == HL_CAPS)
+                    {
+                        ab.append("\033[38;5;202m"); // Set to orange for CAPS
+                    }
+                    else if (color != current_color)
                     {
                         char buf[256];
                         int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
