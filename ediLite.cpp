@@ -289,7 +289,7 @@ int getWindowSize(int *rows, int *cols)
 }
 
 /*** syntax highlighting ***/
-int editorSyntaxToColor(int hl)
+const char* editorSyntaxToColor(int hl)
 {
     switch (hl)
     {
