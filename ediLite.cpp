@@ -299,13 +299,13 @@ const char *editorSyntaxToColor(int hl)
     case HL_KEYWORD1:
         return "\033[38;5;33m"; // Blue
     case HL_KEYWORD2:
-        return "\033[38;5;196m"; // Red
+        return "\033[38;5;5m"; // Purple
     case HL_STRING:
-        return "\033[38;5;160m"; // 
+        return "\033[38;5;95m"; // Brown
     case HL_NUMBER:
-        return "\033[38;5;81m"; // Bright Cyan
+        return "\033[38;5;81m"; // Bright Cyan (or 31)
     case HL_MATCH:
-        return "\033[97;42m"; // white text with red background
+        return "\033[97;226m"; // Bright Yello
     case HL_INCLUDE:
         return "\033[38;5;92m"; // Purple
     case HL_HEADER:
