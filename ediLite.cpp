@@ -82,6 +82,7 @@ enum editorHighlight
     HL_INCLUDE, // New: for #include
     HL_HEADER,  // New: for header file names
     HL_DEFINE   // New: for all #define
+        HL_CAPS // New: for keywords in all caps
 };
 
 struct editorSyntax
@@ -294,7 +295,7 @@ int editorSyntaxToColor(int hl)
     {
     case HL_COMMENT:
     case HL_MLCOMMENT:
-        return 36; // Cyan
+        return 36; // Light Blue
     case HL_KEYWORD1:
         return 33; // Yellow
     case HL_KEYWORD2:
@@ -311,6 +312,8 @@ int editorSyntaxToColor(int hl)
         return 94; // Bright Blue
     case HL_DEFINE:
         return 91; // Bright Red
+    case HL_CAPS:
+        return 96; // Bright Cyan
     default:
         return 37; // White
     }
@@ -417,6 +420,19 @@ void editorUpdateSyntax(erow *row)
                 i = j + 1;
                 prev_sep = 1;
                 continue;
+            }
+        }
+
+        if (E.syntax->flags && prev_sep && isupper(c))
+        {
+            int start = i;
+            while (i < row->rsize && isupper(row->render[i]) && row->render[i] != ' ' && row->render[i] != ',')
+            {
+                i++;
+            }
+            if (i > start)
+            {
+                memset(&row->hl[start], HL_CAPS, i - start); // Apply `HL_CAPS` color
             }
         }
 
