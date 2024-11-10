@@ -299,13 +299,13 @@ const char *editorSyntaxToColor(int hl)
     case HL_KEYWORD1:
         return "\033[38;5;33m"; // Blue
     case HL_KEYWORD2:
-        return "\033[38;5;5m"; // Purple
+        return "\033[38;5;32m"; // Purple
     case HL_STRING:
         return "\033[38;5;95m"; // Brown
     case HL_NUMBER:
-        return "\033[38;5;81m"; // Bright Cyan (or 31)
+        return "\033[38;5;31m"; // Cyan
     case HL_MATCH:
-        return "\033[97;226m"; // Bright Yello
+        return "\033[97;190m"; // Bright Yello
     case HL_INCLUDE:
         return "\033[38;5;92m"; // Purple
     case HL_HEADER:
@@ -315,7 +315,7 @@ const char *editorSyntaxToColor(int hl)
     case HL_CAPS:
         return "\033[38;5;168m"; // Bright Cyan
     default:
-        return "\033[38;5;254m"; // White
+        return "\033[97m"; // White
     }
 }
 
