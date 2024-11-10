@@ -295,27 +295,27 @@ const char *editorSyntaxToColor(int hl)
     {
     case HL_COMMENT:
     case HL_MLCOMMENT:
-        return "\033[38;5;36m"; // Light Blue (ANSI 36)
+        return "\033[38;5;36m"; // Cyan Green
     case HL_KEYWORD1:
-        return "\033[38;5;33m"; // Yellow (ANSI 33)
+        return "\033[38;5;33m"; // Blue
     case HL_KEYWORD2:
-        return "\033[38;5;32m"; // Green (ANSI 32)
+        return "\033[38;5;196m"; // Red
     case HL_STRING:
-        return "\033[38;5;95m"; // Magenta (ANSI 95)
+        return "\033[38;5;160m"; // 
     case HL_NUMBER:
-        return "\033[38;5;31m"; // Red (ANSI 31)
+        return "\033[38;5;81m"; // Bright Cyan
     case HL_MATCH:
-        return "\033[38;5;94m"; // Blue (ANSI 94)
+        return "\033[97;42m"; // white text with red background
     case HL_INCLUDE:
-        return "\033[38;5;92m"; // Bright Green (ANSI 92)
+        return "\033[38;5;92m"; // Purple
     case HL_HEADER:
-        return "\033[38;5;96m"; // Bright Blue (ANSI 96)
+        return "\033[38;5;96m"; // Light Purple
     case HL_DEFINE:
-        return "\033[38;5;92m"; // Bright Red (ANSI 92)
+        return "\033[38;5;92m"; // Purple
     case HL_CAPS:
         return "\033[38;5;168m"; // Bright Cyan
     default:
-        return "\033[38;5;37m"; // White (ANSi 37)
+        return "\033[38;5;254m"; // White
     }
 }
 
