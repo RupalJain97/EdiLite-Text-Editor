@@ -1070,7 +1070,7 @@ void editorDrawRows(std::string &ab)
 
     for (int y = 0; y < E.screenrows; y++)
     {
-        int filerow = y + E.rowoff + 1;
+        int filerow = y + E.rowoff;
         if (filerow >= E.numrows)
         {
             ab.append("~");
@@ -1081,9 +1081,9 @@ void editorDrawRows(std::string &ab)
             char lineNumber[8];
             snprintf(lineNumber, sizeof(lineNumber), "%*d ", lineNumberWidth, filerow); // Line number with padding
 
-            ab.append("\x1b[93m"); // Set color to bright yellow
-            ab.append(lineNumber); // Append line number to the left of each line
-            ab.append("\x1b[39m"); // Reset color to default
+            ab.append("\x1b[93m");     // Set color to bright yellow
+            ab.append(lineNumber + 1); // Append line number to the left of each line
+            ab.append("\x1b[39m");     // Reset color to default
 
             int len = E.row[filerow].rsize - E.coloff;
             if (len < 0)
@@ -1233,7 +1233,7 @@ void editorRefreshScreen()
     // ab.append("\x1b[2J");  // Clear the screen
     ab.append("\x1b[H"); // Move cursor to the top-left corner
 
-    // editorDrawTopStatusBar(ab);
+    editorDrawTopStatusBar(ab);
     editorDrawRows(ab);
     editorDrawStatusBar(ab);
     editorDrawHelpLine(ab);
