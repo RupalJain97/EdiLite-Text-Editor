@@ -812,13 +812,22 @@ void editorFindCallback(const std::string &query, int key)
         memcpy(E.row[saved_hl_line].hl, saved_hl, E.row[saved_hl_line].rsize);
         free(saved_hl);
         saved_hl = nullptr;
-        saved_hl_line = -1;
+        // saved_hl_line = -1;
     }
 
-    if (key == '\r')
+    if (key == '\x1b') // Exit on Esc Key
     {
         last_match = -1;
         direction = 1;
+        return;
+    }
+
+    if (key == '\r') // Exit on Enter key and reset saved_hl state
+    {
+        last_match = -1;
+        direction = 1;
+        free(saved_hl);
+        saved_hl = nullptr;
         return;
     }
     else if (key == ARROW_RIGHT || key == ARROW_DOWN)
