@@ -324,6 +324,11 @@ int is_separator(int c)
     return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL;
 }
 
+int is_separator_caps(int c)
+{
+    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];}:", c) != NULL;
+}
+
 void editorUpdateSyntax(erow *row)
 {
     // Resize hl array to match the row's render size
@@ -422,7 +427,7 @@ void editorUpdateSyntax(erow *row)
             {
                 i++;
             }
-            if (is_separator(row->render[i]))
+            if (is_separator_caps(row->render[i]))
             {
                 memset(&row->hl[start], HL_CAPS, i - start); // Apply `HL_CAPS` color
             }
