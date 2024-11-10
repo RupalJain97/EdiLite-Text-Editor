@@ -417,7 +417,11 @@ void editorUpdateSyntax(erow *row)
             int start = i;
             while (i < row->rsize && isalpha(row->render[i]) && isupper(row->render[i]))
                 i++;
-            memset(&row->hl[start], HL_CAPS, i - start);
+                
+            if (i == row->rsize || is_separator(row->render[i]))
+            {
+                memset(&row->hl[start], HL_CAPS, i - start); // Only highlight if it's a full word
+            }
             prev_sep = 1;
             continue;
         }
