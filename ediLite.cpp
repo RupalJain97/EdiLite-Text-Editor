@@ -1171,10 +1171,10 @@ void editorDrawStatusBar(std::string &ab)
 {
     ab.append("\x1b[7m"); // Invert colors
     char status[80], rstatus[80];
-    int len = snprintf(status, sizeof(status), "%.20s - %d lines",
-                       E.filename ? ('"' + E.filename + '"') : "[No Name]", E.numrows, E.dirty ? "(modified)" : "");
+    int len = snprintf(status, sizeof(status), " \" %.20s \" - %d lines",
+                       E.filename ? E.filename : "[No Name]", E.numrows, E.dirty ? "(modified)" : "");
 
-    int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d", E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
+    int rlen = snprintf(rstatus, sizeof(rstatus), " %s | %d/%d", E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
     if (len > E.screencols)
         len = E.screencols;
     ab.append(status);
