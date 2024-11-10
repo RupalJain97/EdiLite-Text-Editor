@@ -11,6 +11,8 @@ EdiLite is a lightweight terminal-based text editor implemented in C++. This edi
 - **File Management:** Save files with Ctrl-S and view unsaved changes in the status bar.
 
 
+![EdiLite Text Editor](screenshots\final_ss.png)
+
 ### Walkthough the Editor:
 **[Click here...](screenshots\text-editor.mp4)**
 
