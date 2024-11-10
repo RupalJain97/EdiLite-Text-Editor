@@ -1233,7 +1233,7 @@ void editorRefreshScreen()
     // ab.append("\x1b[2J");  // Clear the screen
     ab.append("\x1b[H"); // Move cursor to the top-left corner
 
-    editorDrawTopStatusBar(ab);
+    // editorDrawTopStatusBar(ab);
     editorDrawRows(ab);
     editorDrawStatusBar(ab);
     editorDrawHelpLine(ab);
