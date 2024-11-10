@@ -295,25 +295,25 @@ const char *editorSyntaxToColor(int hl)
     {
     case HL_COMMENT:
     case HL_MLCOMMENT:
-        return "\033[38;5;35m"; // Cyan Green
+        return "\033[38;5;41m"; // Cyan Green
     case HL_KEYWORD1:
         return "\033[38;5;32m"; // Blue
     case HL_KEYWORD2:
-        return "\033[94m"; // Blue
+        return "\033[38;5;12m"; // Blue
     case HL_STRING:
-        return "\033[38;5;95m"; // Brown
+        return "\033[38;5;197m"; // Brown
     case HL_NUMBER:
-        return "\033[38;5;31m"; // Cyan
+        return "\033[38;5;45m"; // Cyan
     case HL_MATCH:
         return "\033[93m"; // Bright Yellow
     case HL_INCLUDE:
         return "\033[38;5;92m"; // Purple
     case HL_HEADER:
-        return "\033[38;5;96m"; // Light Purple
+        return "\033[38;5;3m"; // Light Purple
     case HL_DEFINE:
         return "\033[38;5;92m"; // Purple
     case HL_CAPS:
-        return "\033[38;5;168m"; // Bright Cyan
+        return "\033[38;5;13m"; // Bright Cyan
     default:
         return "\033[97m"; // White
     }
