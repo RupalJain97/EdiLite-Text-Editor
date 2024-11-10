@@ -390,25 +390,17 @@ void editorUpdateSyntax(erow *row)
             }
         }
 
-        // Highlight #include
-        if (i == 0 && strncmp(&row->render[i], "#include", 8) == 0)
+        // Highlight #include and #define
+        if (i == 0 && (strncmp(&row->render[i], "#include", 8) == 0 || strncmp(&row->render[i], "#define", 7) == 0))
         {
-            memset(&row->hl[i], HL_INCLUDE, 8);
-            i += 8;
+            int len = (row->render[i] == '#') ? (row->render[i + 1] == 'i' ? 8 : 7) : 0;
+            memset(&row->hl[i], (len == 8) ? HL_INCLUDE : HL_DEFINE, len);
+            i += len;
             prev_sep = 1;
             continue;
         }
 
-        // Highlight #include
-        if (i == 0 && strncmp(&row->render[i], "#define", 7) == 0)
-        {
-            memset(&row->hl[i], HL_DEFINE, 8);
-            i += 8;
-            prev_sep = 1;
-            continue;
-        }
-
-        // Highlight header files after #include, like <stdio.h>
+        // Highlight header files names, like <stdio.h>
         if (row->render[i] == '<')
         {
             int j = i + 1;
@@ -423,14 +415,14 @@ void editorUpdateSyntax(erow *row)
             }
         }
 
-        if (E.syntax->flags && (prev_sep && (isupper(c) || c == '_' || c == '-')))
+        if (E.syntax->flags && (prev_sep && isupper(c)))
         {
             int start = i;
-            while (i < row->rsize && (isupper(row->render[i]) && ( row->render[i] != ' ' || row->render[i] != ',' || row->render[i] != ';' || row->render[i] == '_')))
+            while (i < row->rsize && (isupper(row->render[i]) || row->render[i] == '_'))
             {
                 i++;
             }
-            if (i > start)
+            if (is_separator(row->render[i]))
             {
                 memset(&row->hl[start], HL_CAPS, i - start); // Apply `HL_CAPS` color
             }
