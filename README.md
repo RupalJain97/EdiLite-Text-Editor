@@ -10,6 +10,10 @@ EdiLite is a lightweight terminal-based text editor implemented in C++. This edi
 - **Navigation and Scrolling:** Full support for cursor navigation with arrow keys, page up/down, and home/end keys.
 - **File Management:** Save files with Ctrl-S and view unsaved changes in the status bar.
 
+
+### Walkthough the Editor:
+**[Click here...](screenshots\text-editor.mp4)**
+
 ## Steps-by-Step Features and Implementation
 
 **1. Entering raw mode.**
@@ -20,8 +24,6 @@ Raw mode is a terminal setting that allows the program to read input directly fr
 - **Disabling canonical mode:** Allows reading input byte-by-byte instead of line-by-line.
 - **Turning off control combinations:** Captures keys like `Ctrl-C`, `Ctrl-Z`, `Ctrl-S`, `Ctrl-Q`, `Ctrl-V`, and `Ctrl-M` without triggering terminal signals.
 - **Error handling:** Exits and print the error details if issues arise.
-
-![Raw Mode](screenshots\proj_text_editor.png)
 
 **2. Quit Command and Screen Clear**
 
