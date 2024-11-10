@@ -1055,10 +1055,12 @@ void editorScroll()
     if (E.cy >= E.rowoff + E.screenrows)
         E.rowoff = E.cy - E.screenrows + 1;
 
+    int lineNumberWidth = std::to_string(E.numrows).length() + 1;
+
     if (E.rx < E.coloff)
         E.coloff = E.rx;
-    if (E.rx >= E.coloff + E.screencols)
-        E.coloff = E.rx - E.screencols + 1;
+    if (E.rx >= E.coloff + E.screencols + lineNumberWidth)
+        E.coloff = E.rx - E.screencols + lineNumberWidth + 1;
 }
 
 void editorDrawRows(std::string &ab)
@@ -1087,7 +1089,7 @@ void editorDrawRows(std::string &ab)
             if (len < 0)
                 len = 0;
             if (len > E.screencols - lineNumberWidth)
-                len = E.screencols - lineNumberWidth;
+                len = E.screencols - lineNumberWidth - 1;
 
             char *c = &E.row[filerow].render[E.coloff];
             unsigned char *hl = &E.row[filerow].hl[E.coloff];
