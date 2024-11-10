@@ -1181,9 +1181,7 @@ void editorDrawRows(std::string &ab)
                     const char *color_code = editorSyntaxToColor(hl[j]);
                     if (color_code != current_color)
                     {
-                        ab.append(color_code); // Apply the custom color for the highlight
-                        ab.append(buf, clen);  // Apply new color
-
+                        ab.append(color_code); // Apply the custom color
                         current_color = color_code;
                     }
                     ab.append(1, c[j]);
