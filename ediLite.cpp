@@ -78,7 +78,10 @@ enum editorHighlight
     HL_KEYWORD2,
     HL_STRING,
     HL_NUMBER,
-    HL_MATCH
+    HL_MATCH,   // For search matches
+    HL_INCLUDE, // New: for #include
+    HL_HEADER,  // New: for header file names
+    HL_DEFINE   // New: for all #define
 };
 
 struct editorSyntax
@@ -302,6 +305,12 @@ int editorSyntaxToColor(int hl)
         return 31; // Red
     case HL_MATCH:
         return 34; // Blue
+    case HL_INCLUDE:
+        return 92; // Bright Green
+    case HL_HEADER:
+        return 94; // Bright Blue
+    case HL_DEFINE:
+        return 91; // Bright Red
     default:
         return 37; // White
     }
@@ -374,6 +383,39 @@ void editorUpdateSyntax(erow *row)
                 memset(&row->hl[i], HL_MLCOMMENT, mcs_len);
                 i += mcs_len;
                 in_comment = 1;
+                continue;
+            }
+        }
+
+        // Highlight #include
+        if (i == 0 && strncmp(&row->render[i], "#include", 8) == 0)
+        {
+            memset(&row->hl[i], HL_INCLUDE, 8);
+            i += 8;
+            prev_sep = 1;
+            continue;
+        }
+
+        // Highlight #include
+        if (i == 0 && strncmp(&row->render[i], "#define", 7) == 0)
+        {
+            memset(&row->hl[i], HL_DEFINE, 8);
+            i += 8;
+            prev_sep = 1;
+            continue;
+        }
+
+        // Highlight header files after #include, like <stdio.h>
+        if (row->render[i] == '<')
+        {
+            int j = i + 1;
+            while (j < row->rsize && row->render[j] != '>')
+                j++;
+            if (j < row->rsize)
+            {
+                memset(&row->hl[i], HL_HEADER, j - i + 1);
+                i = j + 1;
+                prev_sep = 1;
                 continue;
             }
         }
@@ -1171,10 +1213,10 @@ void editorDrawStatusBar(std::string &ab)
 {
     ab.append("\x1b[7m"); // Invert colors
     char status[80], rstatus[80];
-    int len = snprintf(status, sizeof(status), "%.20s - %d lines",
+    int len = snprintf(status, sizeof(status), "\"%.20s\" - %d lines",
                        E.filename ? E.filename : "[No Name]", E.numrows, E.dirty ? "(modified)" : "");
 
-    int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d", E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
+    int rlen = snprintf(rstatus, sizeof(rstatus), " %s | %d/%d", E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
     if (len > E.screencols)
         len = E.screencols;
     ab.append(status);
