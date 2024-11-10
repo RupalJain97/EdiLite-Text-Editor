@@ -12,6 +12,7 @@
 #include <time.h>      // For time handling
 #include <cstdarg>     // For variadic arguments
 #include <fstream>     // For file handling
+#include <signal.h>    // Add this for signal handling
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
@@ -1055,50 +1056,41 @@ void editorScroll()
     if (E.cy >= E.rowoff + E.screenrows)
         E.rowoff = E.cy - E.screenrows + 1;
 
+    int lineNumberWidth = std::to_string(E.numrows).length() + 1;
+
     if (E.rx < E.coloff)
         E.coloff = E.rx;
-    if (E.rx >= E.coloff + E.screencols)
-        E.coloff = E.rx - E.screencols + 1;
+    if (E.rx >= E.coloff + E.screencols + lineNumberWidth)
+        E.coloff = E.rx - E.screencols + lineNumberWidth + 1;
 }
 
 void editorDrawRows(std::string &ab)
 {
+    // Calculate line number width based on total lines
+    int lineNumberWidth = std::to_string(E.numrows).length() + 1;
+
     for (int y = 0; y < E.screenrows; y++)
     {
         int filerow = y + E.rowoff;
         if (filerow >= E.numrows)
         {
-            if (E.numrows == 0 && y == E.screenrows / 3)
-            {
-                // Display the welcome message a third of the way down
-                char welcome[80];
-                int welcomelen = snprintf(welcome, sizeof(welcome), "EdiLite Text editor -- version %s", EDILITE_VERSION);
-                if (welcomelen > E.screencols)
-                    welcomelen = E.screencols;
-
-                int padding = (E.screencols - welcomelen) / 2;
-                if (padding)
-                {
-                    ab.append("~");
-                    padding--;
-                }
-                while (padding--)
-                    ab.append(" ");
-                ab.append(welcome, welcomelen);
-            }
-            else
-            {
-                ab.append("~");
-            }
+            ab.append("~");
         }
         else
         {
+            // Display the line number with padding to keep alignment
+            char lineNumber[8];
+            snprintf(lineNumber, sizeof(lineNumber), "%*d ", lineNumberWidth, filerow + 1); // Line number with padding
+
+            ab.append("\x1b[93m"); // Set color to bright yellow
+            ab.append(lineNumber); // Append line number to the left of each line
+            ab.append("\x1b[39m"); // Reset color to default
+
             int len = E.row[filerow].rsize - E.coloff;
             if (len < 0)
                 len = 0;
-            if (len > E.screencols)
-                len = E.screencols;
-            // ab.append(&E.row[filerow].render[E.coloff], len);
+            if (len > E.screencols - lineNumberWidth - 1)
+                len = E.screencols - lineNumberWidth - 1;
 
             char *c = &E.row[filerow].render[E.coloff];
             unsigned char *hl = &E.row[filerow].hl[E.coloff];
@@ -1148,6 +1140,33 @@ void editorDrawRows(std::string &ab)
     }
 }
 
+void editorDrawTopStatusBar(std::string &ab)
+{
+    ab.append("\x1b[7m"); // Invert colors for the status bar
+    std::string editor_name = std::string("EdiLite Text Editor -- version ") + EDILITE_VERSION;
+    // const char *editor_name = editor_name.c_str();
+
+    int len = editor_name.length();
+    int padding = (E.screencols - len) / 2; // Center-align the text
+    if (padding > 0)
+    {
+        for (int i = 0; i < padding; i++)
+        {
+            ab.append(" ");
+        }
+    }
+    ab.append(editor_name);
+
+    // Fill the remaining space
+    while (len + padding < E.screencols)
+    {
+        ab.append(" ");
+        len++;
+    }
+
+    ab.append("\x1b[m\r\n"); // Reset formatting and move to the next line
+}
+
 void editorDrawStatusBar(std::string &ab)
 {
     ab.append("\x1b[7m"); // Invert colors
@@ -1186,22 +1205,26 @@ void editorDrawMessageBar(std::string &ab)
         ab.append(E.statusmsg, msglen);
 }
 
+void editorDrawHelpLine(std::string &ab)
+{
+    ab.append("\x1b[7m"); // Invert colors for emphasis
+    std::string helpText = "HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-Q = quit";
+    int helpTextLen = helpText.length();
+    if (helpTextLen > E.screencols)
+        helpTextLen = E.screencols;
+    ab.append(helpText); // Add the help text
+    while (helpTextLen < E.screencols)
+    {
+        ab.append(" "); // Fill the rest with spaces
+        helpTextLen++;
+    }
+    ab.append("\x1b[m"); // Reset colors
+    ab.append("\r\n");
+}
+
 void editorRefreshScreen()
 {
     editorScroll();
-    /*
-    write() and STDOUT_FILENO come from <unistd.h>.
-
-    The 4 in our write() call means we are writing 4 bytes out to the terminal. The first byte is \x1b, which is the escape character, or 27 in decimal. (Try and remember \x1b, we will be using it a lot.) The other three bytes are [2J.
-    */
-    // write(STDOUT_FILENO, "\x1b[2J", 4);
-
-    /*
-    reposition the cursor which is at the top-left corner so that we’re ready to draw the editor interface from top to bottom.
-
-    if you have an 80×24 size terminal and you want the cursor in the center of the screen, you could use the command <esc>[12;40H. (Multiple arguments are separated by a ; character.) The default arguments for H both happen to be 1.
-    */
-    // write(STDOUT_FILENO, "\x1b[H", 3);
 
     std::string ab;
 
@@ -1211,16 +1234,20 @@ void editorRefreshScreen()
     // ab.append("\x1b[2J");  // Clear the screen
     ab.append("\x1b[H"); // Move cursor to the top-left corner
 
+    editorDrawTopStatusBar(ab);
     editorDrawRows(ab);
     editorDrawStatusBar(ab);
+    editorDrawHelpLine(ab);
     editorDrawMessageBar(ab);
 
-    // write(STDOUT_FILENO, "\x1b[H", 3);
+    // Calculate line number width dynamically
+    int lineNumberWidth = std::to_string(E.numrows).length() + 1;
+
     // Move the cursor back to the top-left corner
-    ab.append("\x1b[H");
+    // ab.append("\x1b[H");
 
     char buf[32];
-    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
+    int welcomelen = snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 2, (E.rx - E.coloff) + lineNumberWidth + 2);
     ab.append(buf);
 
     ab.append("\x1b[?25h"); // Hide the cursor
@@ -1238,8 +1265,17 @@ void editorSetStatusMessage(const char *fmt, ...)
     E.statusmsg_time = time(nullptr);
 }
 
+/*** Dynamic Window Screen Size ***/
+// Function to update screen size on window resize
+void handleWindowResize(int unused)
+{
+    if (getWindowSize(&E.screenrows, &E.screencols) == -1)
+        die("getWindowSize");
+    E.screenrows -= 4; // Adjust for reserved rows like status bar
+    editorRefreshScreen();
+}
+
 /*** Init ***/
-//  initialize all the fields in the E struct.
 void initEditor()
 {
     E.cx = 0;
@@ -1258,7 +1294,7 @@ void initEditor()
     if (getWindowSize(&E.screenrows, &E.screencols) == -1)
         die("getWindowSize");
 
-    E.screenrows -= 2; // Reserve one row for the status bar
+    E.screenrows -= 4; // Reserve 3 rows for the status bar
 }
 
 int main(int argc, char *argv[])
@@ -1268,12 +1304,15 @@ int main(int argc, char *argv[])
     enableRawMode();
     initEditor();
 
+    // Set up SIGWINCH to call handleWindowResize when window size changes
+    signal(SIGWINCH, handleWindowResize);
+
     if (argc >= 2)
     {
         editorOpen(argv[1]);
     }
 
-    editorSetStatusMessage("HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-Q = quit");
+    editorSetStatusMessage("Welcome to EdiLite, Use Arrow keys to navigate.");
     while (1)
     {
         editorRefreshScreen();
