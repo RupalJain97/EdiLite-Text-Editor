@@ -81,7 +81,7 @@ enum editorHighlight
     HL_MATCH,   // For search matches
     HL_INCLUDE, // New: for #include
     HL_HEADER,  // New: for header file names
-    HL_CAPS     // New: for all-uppercase words
+    HL_DEFINE   // New: for all #define
 };
 
 struct editorSyntax
@@ -309,7 +309,7 @@ int editorSyntaxToColor(int hl)
         return 92; // Bright Green
     case HL_HEADER:
         return 94; // Bright Blue
-    case HL_CAPS:
+    case HL_DEFINE:
         return 91; // Bright Red
     default:
         return 37; // White
@@ -396,6 +396,15 @@ void editorUpdateSyntax(erow *row)
             continue;
         }
 
+        // Highlight #include
+        if (i == 0 && strncmp(&row->render[i], "#define", 7) == 0)
+        {
+            memset(&row->hl[i], HL_DEFINE, 8);
+            i += 8;
+            prev_sep = 1;
+            continue;
+        }
+
         // Highlight header files after #include, like <stdio.h>
         if (row->render[i] == '<')
         {
@@ -409,21 +418,6 @@ void editorUpdateSyntax(erow *row)
                 prev_sep = 1;
                 continue;
             }
-        }
-
-        // Highlight all-uppercase words
-        if (isalpha(c) && isupper(c) && prev_sep)
-        {
-            int start = i;
-            while (i < row->rsize && isalpha(row->render[i]) && isupper(row->render[i]))
-                i++;
-
-            if (i < row->rsize && (is_separator(row->render[i]) || row->render[i] == ','))
-            {
-                memset(&row->hl[start], HL_CAPS, i - start); // Only highlight if it's a full word
-            }
-            prev_sep = 1;
-            continue;
         }
 
         if (E.syntax->flags & HL_HIGHLIGHT_STRINGS)
