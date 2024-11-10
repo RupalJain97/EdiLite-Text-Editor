@@ -12,6 +12,7 @@
 #include <time.h>      // For time handling
 #include <cstdarg>     // For variadic arguments
 #include <fstream>     // For file handling
+#include <signal.h>    // Add this for signal handling
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
@@ -1264,6 +1265,16 @@ void editorSetStatusMessage(const char *fmt, ...)
     E.statusmsg_time = time(nullptr);
 }
 
+/*** Dynamic Window Screen Size ***/
+// Function to update screen size on window resize
+void handleWindowResize(int unused)
+{
+    if (getWindowSize(&E.screenrows, &E.screencols) == -1)
+        die("getWindowSize");
+    E.screenrows -= 4; // Adjust for reserved rows like status bar
+    editorRefreshScreen();
+}
+
 /*** Init ***/
 void initEditor()
 {
@@ -1292,6 +1303,9 @@ int main(int argc, char *argv[])
 
     enableRawMode();
     initEditor();
+
+    // Set up SIGWINCH to call handleWindowResize when window size changes
+    signal(SIGWINCH, handleWindowResize);
 
     if (argc >= 2)
     {
