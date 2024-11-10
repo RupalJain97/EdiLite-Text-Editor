@@ -812,7 +812,7 @@ void editorFindCallback(const std::string &query, int key)
         memcpy(E.row[saved_hl_line].hl, saved_hl, E.row[saved_hl_line].rsize);
         free(saved_hl);
         saved_hl = nullptr;
-        // saved_hl_line = -1;
+        saved_hl_line = -1;
     }
 
     if (key == '\r' || key == '\x1b')
