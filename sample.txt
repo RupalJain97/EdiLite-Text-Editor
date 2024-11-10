@@ -1,0 +1,16 @@
+
+Wondering why this text editor stands out compared to others:
+
+1. Lightweight and Efficient: This editor is designed to be minimalistic, keeping performance smooth without draining resources. 
+
+2. Customizable Syntax Highlighting: It supports a range of custom colors for keywords, comments, strings, constants, and more, allowing for quick visual differentiation between code elements.
+
+3. Built-In Search with Highlights: The editor includes a search feature that not only finds text but also highlights matches with a custom background color, making it easy to spot and review specific instances within the code.
+
+4. Line Numbering: Each line is numbered, which helps with navigation and error tracking, especially when working on larger files. Unlike many simple text editors, this one maintains the alignment and readability of line numbers, even in complex, multi-line code.
+
+5. Window Resize Compatibility: This editor adapts to changes in terminal window size, allowing for a flexible workspace. It can be resized without losing alignment.
+
+6. Keyboard Shortcuts for Fast Navigation: It includes essential shortcuts like search, save, quit, and movement through the document using the arrows and other control keys, helping users edit files efficiently without relying on a mouse.
+
+7. Saving the files to disk: Easily saves edited content to disk with a simple command, ensuring data integrity and providing users with control over file storage and updates.

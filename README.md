@@ -130,4 +130,4 @@ EdiLite’s syntax highlighting adapts automatically based on file type, using s
 
 ## Code Length
 
-1286 lines of code
+1383 lines of code

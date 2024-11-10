@@ -1,31 +1,18 @@
 #include <iostream>
+using namespace std;
 
+#define MAX_NUM 100
+#define DEFAULT_TEXT "Hi, there!"
+
+void prototype(int ab, string str);
+
+/* Main funtion */
 int main()
 {
-	for (int i = 30; i <= 37; i++)
-	{
-		std::cout << "\033[" << i << "m" << i << ": foreground text\033[0m   ";
-		std::cout << "\033[" << i + 10 << "m" << i + 10 << ": background text\033[0m\n";
+	// Printing loops
+	cout << DEFAULT_TEXT;
+	for (int i = 1; i <= 1383; i++){
+		cout << "Loop number " << i << " \n";
 	}
-
-	std::cout << "\nHigh-Intensity ANSI Colors (90-97) - Foreground and Background:\n";
-	for (int i = 90; i <= 97; i++)
-	{
-		std::cout << "\033[" << i << "m" << i << ": foreground text\033[0m   ";
-		std::cout << "\033[" << i + 10 << "m" << i + 10 << ": background text\033[0m\n";
-	}
-
-	std::cout << "\nExtended 256 Colors (38;5;0-255):\n";
-	for (int i = 0; i < 256; i++)
-	{
-		std::cout << "  \033[38;5;" << i << "m" << i << ": sample \033[0m  ";
-		std::cout << "\033[48;5;" << i << "m" << i << ": sample\033[0m   \t";
-		if ((i + 1) % 4 == 0)
-		{ // To format into columns
-			std::cout << "\n";
-		}
-	}
-
-	std::cout << "\n";
 	return 0;
 }
