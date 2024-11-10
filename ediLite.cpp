@@ -295,7 +295,7 @@ const char *editorSyntaxToColor(int hl)
     {
     case HL_COMMENT:
     case HL_MLCOMMENT:
-        return "\033[38;5;36m"; // Cyan Green
+        return "\033[38;5;35m"; // Cyan Green
     case HL_KEYWORD1:
         return "\033[38;5;32m"; // Blue
     case HL_KEYWORD2:
