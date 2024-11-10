@@ -412,13 +412,13 @@ void editorUpdateSyntax(erow *row)
         }
 
         // Highlight all-uppercase words
-        if (isalpha(c) && isupper(c))
+        if (isalpha(c) && isupper(c) && prev_sep)
         {
             int start = i;
             while (i < row->rsize && isalpha(row->render[i]) && isupper(row->render[i]))
                 i++;
-                
-            if (i == row->rsize || is_separator(row->render[i]))
+
+            if (i < row->rsize && (is_separator(row->render[i]) || row->render[i] == ','))
             {
                 memset(&row->hl[start], HL_CAPS, i - start); // Only highlight if it's a full word
             }
