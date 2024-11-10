@@ -815,7 +815,7 @@ void editorFindCallback(const std::string &query, int key)
         saved_hl_line = -1;
     }
 
-    if (key == '\r' || key == '\x1b')
+    if (key == '\r')
     {
         last_match = -1;
         direction = 1;
