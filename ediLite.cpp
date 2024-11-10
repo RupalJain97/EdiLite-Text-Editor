@@ -313,7 +313,7 @@ int editorSyntaxToColor(int hl)
     case HL_DEFINE:
         return 92; // Bright Red
     case HL_CAPS:
-        return 93; // Bright Cyan
+        return 35; // Bright Cyan
     default:
         return 37; // White
     }
