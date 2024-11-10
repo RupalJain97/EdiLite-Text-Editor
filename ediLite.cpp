@@ -883,7 +883,7 @@ void editorFind()
     int saved_coloff = E.coloff;
     int saved_rowoff = E.rowoff;
 
-    std::string query = editorPrompt("Search: %s (Use Arrows keys & then press Enter key to exit search | Press Esc 3 times to exit)", editorFindCallback);
+    std::string query = editorPrompt("Search: %s (Use Arrows & Enter to exit | Press Esc 3 times to exit)", editorFindCallback);
     if (query.empty())
         return;
     else
