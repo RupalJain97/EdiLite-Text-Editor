@@ -2,9 +2,11 @@
 
 EdiLite is a lightweight terminal-based text editor implemented in C++. This editor supports essential editing features, including syntax highlighting, line-based navigation, and file saving.
 
-Demo Video:
 
-[![EdiLite Text Editor](screenshots/thumbnail.jpg)](https://youtu.be/1OCo7KOovRY)
+<!-- [![EdiLite Text Editor](screenshots/thumbnail.jpg)](https://youtu.be/1OCo7KOovRY) -->
+
+## Walkthough the Editor:
+**[Click here...](screenshots\text-editor.mp4)**
 
 ## Key Features
 
@@ -16,9 +18,6 @@ Demo Video:
 
 
 ![EdiLite Text Editor](screenshots/final_ss.png)
-
-### Walkthough the Editor:
-**[Click here...](screenshots\text-editor.mp4)**
 
 ## Steps-by-Step Features and Implementation
 
