@@ -120,7 +120,7 @@ g++ -o EdiLite EdiLite.cpp -Wall
 
 If no filename is provided, a new file will be created upon saving.
 
-**\*Note:** Developed and tested on Ubuntu.\*
+**\*Note:** Developed and tested on Ubuntu and Mac.\*
 
 ## Usage
 
